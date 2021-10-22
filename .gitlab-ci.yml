@@ -1,0 +1,24 @@
+include:
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/stages.yml"
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/test/check-merge-compatibility.yml"
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/test/lint-dockerfile.yaml"
+
+Build docker image:
+  stage: release
+  interruptible: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+  services:
+    - name: "$CI_REGISTRY/waldur/waldur-pipelines/docker:19.03.12-dind"
+      alias: docker
+      command: ["--mtu=1400"]
+  variables:
+    DOCKER_REGISTRY: registry.hpc.ut.ee/mirror/
+  script:
+    - $CI_COMMIT_SHA > src/COMMIT
+    - echo "$WALDUR_DOCKER_HUB_PASSWORD" | docker login -u "$WALDUR_DOCKER_HUB_USER" --password-stdin
+    - docker build . -t opennode/$CI_PROJECT_NAME --build-arg DOCKER_REGISTRY=$DOCKER_REGISTRY
+    - docker push opennode/$CI_PROJECT_NAME:latest
