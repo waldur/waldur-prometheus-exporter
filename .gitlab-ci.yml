@@ -18,7 +18,7 @@ Build docker image:
   variables:
     DOCKER_REGISTRY: registry.hpc.ut.ee/mirror/
   script:
-    - $CI_COMMIT_SHA > src/COMMIT
+    - echo $CI_COMMIT_SHA > src/COMMIT
     - echo "$WALDUR_DOCKER_HUB_PASSWORD" | docker login -u "$WALDUR_DOCKER_HUB_USER" --password-stdin
     - docker build . -t opennode/$CI_PROJECT_NAME --build-arg DOCKER_REGISTRY=$DOCKER_REGISTRY
     - docker push opennode/$CI_PROJECT_NAME:latest
