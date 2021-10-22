@@ -1,8 +1,8 @@
-from time import sleep
-from prometheus_client import start_http_server
-from waldur_client import WaldurClient
-from prometheus_client import Gauge
 import os
+from time import sleep
+
+from prometheus_client import Gauge, start_http_server
+from waldur_client import WaldurClient
 
 WALDUR_API_URL = os.environ["WALDUR_API_URL"]
 WALDUR_API_TOKEN = os.environ["WALDUR_API_TOKEN"]

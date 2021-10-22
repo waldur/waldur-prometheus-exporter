@@ -6,7 +6,7 @@ include:
   - project: "waldur/waldur-pipelines"
     file: "/templates/test/lint-dockerfile.yaml"
 
-Build docker image:
+Build and push docker image:
   stage: release
   interruptible: true
   rules:
