@@ -21,37 +21,68 @@ if __name__ == "__main__":
     client = WaldurClient(WALDUR_API_URL, WALDUR_API_TOKEN)
     start_http_server(8080)
 
-    users_total = Gauge("waldur_users_total", "Total count of users in Waldur instance")
-    customers_total = Gauge(
-        "waldur_customers_total", "Total count of organizations in Waldur instance"
-    )
+    users_total = Gauge("waldur_users_total", "Total count of users")
+    customers_total = Gauge("waldur_customers_total", "Total count of organizations")
     resources_total = Gauge(
         "waldur_marketplace_resources_total",
-        "Total count of marketplace resources in Waldur instance",
+        "Total count of marketplace resources",
     )
-    projects_total = Gauge(
-        "waldur_projects_total", "Total count of projects in Waldur instance"
+    projects_total = Gauge("waldur_projects_total", "Total count of projects")
+    waldur_owners_users_total = Gauge(
+        "waldur_owners_users_total", "Total count of users with owner permissions"
+    )
+    waldur_support_users_total = Gauge(
+        "waldur_support_users_total", "Total count of support users"
+    )
+    waldur_local_users_total = Gauge(
+        "waldur_local_users_total",
+        "Total count of users with local registration method",
+    )
+    waldur_saml2_users_total = Gauge(
+        "waldur_saml2_users_total",
+        "Total count of users with saml2 registration method",
+    )
+    waldur_tara_users_total = Gauge(
+        "waldur_tara_users_total", "Total count of users with tara registration method"
+    )
+    waldur_eduteams_users_total = Gauge(
+        "waldur_eduteams_users_total",
+        "Total count of users with eduteams registration method",
     )
 
     while True:
         try:
-            users_count = client.count_users()
-            customers_count = client.count_customers()
-            marketplace_resources_count = client.count_marketplace_resources()
-            projects_count = client.count_projects()
-
-            users_total.set(users_count)
-            customers_total.set(customers_count)
-            resources_total.set(marketplace_resources_count)
-            projects_total.set(projects_count)
-
-            logger.info(f"Total count of users: {users_count}")
-            logger.info(f"Total count of customers: {customers_count}")
-            logger.info(
-                f"Total count of marketplace resources: {marketplace_resources_count}"
+            users_total.set(client.count_users())
+            customers_total.set(client.count_customers())
+            resources_total.set(client.count_marketplace_resources())
+            projects_total.set(client.count_projects())
+            waldur_owners_users_total.set(
+                client.count_customer_permissions(params={"role": "owner"})
             )
-            logger.info(f"Total count of projects: {projects_count}")
-            logger.info("\n")
+            waldur_support_users_total.set(
+                client.count_users(params={"is_support": "true", "is_active": "true"})
+            )
+            waldur_local_users_total.set(
+                client.count_users(
+                    params={"registration_method": "default", "is_active": "true"}
+                )
+            )
+            waldur_saml2_users_total.set(
+                client.count_users(
+                    params={"registration_method": "saml2", "is_active": "true"}
+                )
+            )
+            waldur_tara_users_total.set(
+                client.count_users(
+                    params={"registration_method": "tara", "is_active": "true"}
+                )
+            )
+            waldur_eduteams_users_total.set(
+                client.count_users(
+                    params={"registration_method": "eduteams", "is_active": "true"}
+                )
+            )
+
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
         except Exception as e:
