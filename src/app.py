@@ -54,7 +54,9 @@ if __name__ == "__main__":
         try:
             users_total.set(client.count_users())
             customers_total.set(client.count_customers())
-            resources_total.set(client.count_marketplace_resources())
+            resources_total.set(
+                client.count_marketplace_resources(params={"state": "OK"})
+            )
             projects_total.set(client.count_projects())
             waldur_owners_users_total.set(
                 client.count_customer_permissions(params={"role": "owner"})
