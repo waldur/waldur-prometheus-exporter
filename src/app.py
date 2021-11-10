@@ -52,19 +52,19 @@ if __name__ == "__main__":
 
     organization_project_count = Gauge(
         "organization_project_count",
-        "organization_project_count",
+        "Count of projects for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
     organization_resource_count = Gauge(
         "organization_resource_count",
-        "organization_resource_count",
+        "Count of resource for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
     organization_team_count = Gauge(
         "organization_team_count",
-        "organization_team_count",
+        "Count of team for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
