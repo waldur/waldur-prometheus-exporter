@@ -50,6 +50,24 @@ if __name__ == "__main__":
         "Total count of users with eduteams registration method",
     )
 
+    organization_project_count = Gauge(
+        "organization_project_count",
+        "organization_project_count",
+        ["abbreviation", "name", "uuid"],
+    )
+
+    organization_resource_count = Gauge(
+        "organization_resource_count",
+        "organization_resource_count",
+        ["abbreviation", "name", "uuid"],
+    )
+
+    organization_team_count = Gauge(
+        "organization_team_count",
+        "organization_team_count",
+        ["abbreviation", "name", "uuid"],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -85,9 +103,37 @@ if __name__ == "__main__":
                 )
             )
 
+            for c in client.get_marketplace_stats("organization_project_count"):
+                organization_project_count.labels(
+                    c["customer__abbreviation"],
+                    c["customer__name"],
+                    c["customer__uuid"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats("organization_resource_count"):
+                organization_resource_count.labels(
+                    c["project__customer__abbreviation"],
+                    c["project__customer__name"],
+                    c["project__customer__uuid"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats("customer_team_count"):
+                organization_team_count.labels(
+                    c["customer__abbreviation"],
+                    c["customer__name"],
+                    c["customer__uuid"],
+                ).inc(c["count"])
+
+            for c in client.get_marketplace_stats("project_team_count"):
+                organization_team_count.labels(
+                    c["project__customer__abbreviation"],
+                    c["project__customer__name"],
+                    c["project__customer__uuid"],
+                ).inc(c["count"])
+
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
         except Exception as e:
             logger.error(f"Unable to collect metrics. Exception: {e}")
 
-        sleep(10.0)
+        sleep(120.0)
