@@ -50,21 +50,21 @@ if __name__ == "__main__":
         "Total count of users with eduteams registration method",
     )
 
-    organization_project_number = Gauge(
-        "organization_project_number",
-        "Number of projects for each organization",
+    organization_project_count = Gauge(
+        "organization_project_count",
+        "Count of projects for each organization.",
         ["abbreviation", "name", "uuid"],
     )
 
-    organization_resource_number = Gauge(
-        "organization_resource_number",
-        "Number of resources for every organization.",
+    organization_resource_count = Gauge(
+        "organization_resource_count",
+        "Count of resources for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
-    organization_team_number = Gauge(
-        "organization_team_number",
-        "Number of teams for every organization.",
+    organization_members_count = Gauge(
+        "organization_members_count",
+        "Count of members for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
@@ -104,28 +104,28 @@ if __name__ == "__main__":
             )
 
             for c in client.get_marketplace_stats("organization_project_count"):
-                organization_project_number.labels(
+                organization_project_count.labels(
                     c["abbreviation"],
                     c["name"],
                     c["uuid"],
                 ).set(c["count"])
 
             for c in client.get_marketplace_stats("organization_resource_count"):
-                organization_resource_number.labels(
+                organization_resource_count.labels(
                     c["abbreviation"],
                     c["name"],
                     c["uuid"],
                 ).set(c["count"])
 
             for c in client.get_marketplace_stats("customer_member_count"):
-                organization_team_number.labels(
+                organization_members_count.labels(
                     c["abbreviation"],
                     c["name"],
                     c["uuid"],
                 ).inc(c["count"])
 
             for c in client.get_marketplace_stats("project_member_count"):
-                organization_team_number.labels(
+                organization_members_count.labels(
                     c["abbreviation"],
                     c["name"],
                     c["uuid"],
