@@ -123,6 +123,8 @@ if __name__ == "__main__":
                     c["uuid"],
                 ).set(c["count"])
 
+            organization_members_count.clear()
+
             for c in client.get_marketplace_stats("customer_member_count"):
                 organization_members_count.labels(
                     c["abbreviation"],
@@ -136,6 +138,8 @@ if __name__ == "__main__":
                     c["name"],
                     c["uuid"],
                 ).inc(c["count"])
+
+            openstack_tenant_limit.clear()
 
             for r in client.list_marketplace_resources(
                 state="OK", offering_type="Packages.Template"
@@ -153,4 +157,4 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Unable to collect metrics. Exception: {e}")
 
-        sleep(120.0)
+        sleep(10)
