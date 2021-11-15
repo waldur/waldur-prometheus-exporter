@@ -68,6 +68,12 @@ if __name__ == "__main__":
         ["abbreviation", "name", "uuid"],
     )
 
+    openstack_tenant_limit = Gauge(
+        "openstack_tenant_limit",
+        "Aggregated Openstack tenant limits.",
+        ["name"],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -130,6 +136,17 @@ if __name__ == "__main__":
                     c["name"],
                     c["uuid"],
                 ).inc(c["count"])
+
+            for r in client.list_marketplace_resources(
+                state="OK", offering_type="Packages.Template"
+            ):
+                for name, label in {
+                    "ram": "ram",
+                    "cores": "vcpu",
+                    "storage": "storage",
+                }.items():
+                    if r["limits"].get(name) and r["limits"].get(name) > 0:
+                        openstack_tenant_limit.labels(label).inc(r["limits"].get(name))
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
