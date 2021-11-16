@@ -2,16 +2,11 @@ include:
   - project: "waldur/waldur-pipelines"
     file: "/templates/stages.yml"
   - project: "waldur/waldur-pipelines"
-    file: "/templates/release/sync-to-github.yml"
-  - project: "waldur/waldur-pipelines"
     file: "/templates/test/check-merge-compatibility.yml"
   - project: "waldur/waldur-pipelines"
     file: "/templates/test/lint-dockerfile.yaml"
   - project: "waldur/waldur-pipelines"
     file: "/templates/release/build-and-push-docker-image.yml"
-
-variables:
-  GITHUB_WALDUR_REPO_URL: "git@github.com:waldur/waldur-prometheus-exporter.git"
 
 Run linters:
   image: "$CI_REGISTRY/waldur/waldur-pipelines/python:3.8"
