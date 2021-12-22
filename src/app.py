@@ -74,6 +74,12 @@ if __name__ == "__main__":
         ["name"],
     )
 
+    aggregated_usages = Gauge(
+        "aggregated_usages",
+        "Aggregated usages",
+        ["offering_uuid", "type"],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -141,6 +147,12 @@ if __name__ == "__main__":
 
             for key, value in client.get_marketplace_stats("resources_limits").items():
                 openstack_tenant_limit.labels(key).set(value)
+
+            for c in client.get_marketplace_stats("component_usages"):
+                aggregated_usages.labels(
+                    c["offering_uuid"],
+                    c["component_type"],
+                ).set(c["usage"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
