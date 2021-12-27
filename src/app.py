@@ -68,10 +68,10 @@ if __name__ == "__main__":
         ["abbreviation", "name", "uuid"],
     )
 
-    openstack_tenant_limit = Gauge(
-        "openstack_tenant_limit",
-        "Aggregated OpenStack tenant limits.",
-        ["name"],
+    resources_limits = Gauge(
+        "resources_limits",
+        "Resources limits",
+        ["offering_uuid", "name"],
     )
 
     aggregated_usages = Gauge(
@@ -145,8 +145,11 @@ if __name__ == "__main__":
                     c["uuid"],
                 ).inc(c["count"])
 
-            for key, value in client.get_marketplace_stats("resources_limits").items():
-                openstack_tenant_limit.labels(key).set(value)
+            for c in client.get_marketplace_stats("resources_limits"):
+                resources_limits.labels(
+                    c["offering_uuid"],
+                    c["name"],
+                ).set(c["value"])
 
             for c in client.get_marketplace_stats("component_usages"):
                 aggregated_usages.labels(
