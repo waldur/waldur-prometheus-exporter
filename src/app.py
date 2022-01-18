@@ -80,6 +80,12 @@ if __name__ == "__main__":
         ["offering_uuid", "division_name", "division_uuid", "type"],
     )
 
+    count_users_of_service_provider = Gauge(
+        "count_users_of_service_provider",
+        "Count of users by different registation type visible to service provider.",
+        ["customer_uuid", "registration_method"],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -160,6 +166,12 @@ if __name__ == "__main__":
                     c["division_uuid"],
                     c["component_type"],
                 ).set(c["usage"])
+
+            for c in client.get_marketplace_stats("count_users_of_service_provider"):
+                count_users_of_service_provider.labels(
+                    c["customer_uuid"],
+                    c["registration_method"],
+                ).set(c["users_count"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
