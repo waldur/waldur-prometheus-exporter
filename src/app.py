@@ -82,8 +82,26 @@ if __name__ == "__main__":
 
     count_users_of_service_provider = Gauge(
         "count_users_of_service_provider",
-        "Count of users by different registation type visible to service provider.",
-        ["customer_uuid", "registration_method"],
+        "Count of users visible to service provider.",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_division_uuid",
+            "customer_division_name",
+        ],
+    )
+
+    count_projects_of_service_provider = Gauge(
+        "count_projects_of_service_provider",
+        "Count of projects visible to service provider.",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_division_uuid",
+            "customer_division_name",
+        ],
     )
 
     while True:
@@ -167,11 +185,25 @@ if __name__ == "__main__":
                     c["component_type"],
                 ).set(c["usage"])
 
-            for c in client.get_marketplace_stats("count_users_of_service_provider"):
+            for c in client.get_marketplace_stats("count_users_of_service_providers"):
                 count_users_of_service_provider.labels(
+                    c["service_provider_uuid"],
                     c["customer_uuid"],
-                    c["registration_method"],
-                ).set(c["users_count"])
+                    c["customer_name"],
+                    c["customer_division_uuid"],
+                    c["customer_division_name"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_projects_of_service_providers"
+            ):
+                count_projects_of_service_provider.labels(
+                    c["service_provider_uuid"],
+                    c["customer_uuid"],
+                    c["customer_name"],
+                    c["customer_division_uuid"],
+                    c["customer_division_name"],
+                ).set(c["count"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
