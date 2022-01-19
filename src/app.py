@@ -104,6 +104,19 @@ if __name__ == "__main__":
         ],
     )
 
+    count_projects_of_service_provider_grouped_by_oecd = Gauge(
+        "count_projects_of_service_provider_grouped_by_oecd",
+        "Count of projects visible to service provider and grouped by oecd.",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_division_uuid",
+            "customer_division_name",
+            "oecd_code",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -203,6 +216,18 @@ if __name__ == "__main__":
                     c["customer_name"],
                     c["customer_division_uuid"],
                     c["customer_division_name"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_projects_of_service_providers_grouped_by_oecd"
+            ):
+                count_projects_of_service_provider_grouped_by_oecd.labels(
+                    c["service_provider_uuid"],
+                    c["customer_uuid"],
+                    c["customer_name"],
+                    c["customer_division_uuid"],
+                    c["customer_division_name"],
+                    c["oecd_fos_2007_code"],
                 ).set(c["count"])
 
         except WaldurClientException as e:
