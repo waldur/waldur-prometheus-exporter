@@ -71,13 +71,19 @@ if __name__ == "__main__":
     resources_limits = Gauge(
         "resources_limits",
         "Resources limits",
-        ["offering_uuid", "division_name", "division_uuid", "limit_name"],
+        [
+            "offering_uuid",
+            "offering_country",
+            "division_name",
+            "division_uuid",
+            "limit_name",
+        ],
     )
 
     aggregated_usages = Gauge(
         "aggregated_usages",
         "Aggregated usages",
-        ["offering_uuid", "division_name", "division_uuid", "type"],
+        ["offering_uuid", "offering_country", "division_name", "division_uuid", "type"],
     )
 
     count_users_of_service_provider = Gauge(
@@ -185,6 +191,7 @@ if __name__ == "__main__":
             for c in client.get_marketplace_stats("resources_limits"):
                 resources_limits.labels(
                     c["offering_uuid"],
+                    c["offering_country"],
                     c["division_name"],
                     c["division_uuid"],
                     c["name"],
@@ -193,6 +200,7 @@ if __name__ == "__main__":
             for c in client.get_marketplace_stats("component_usages"):
                 aggregated_usages.labels(
                     c["offering_uuid"],
+                    c["offering_country"],
                     c["division_name"],
                     c["division_uuid"],
                     c["component_type"],
