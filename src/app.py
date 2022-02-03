@@ -123,6 +123,14 @@ if __name__ == "__main__":
         ],
     )
 
+    total_cost_of_active_resources_per_offering = Gauge(
+        "total_cost_of_active_resources_per_offering",
+        "Total cost of active resources per offering.",
+        [
+            "offering_uuid",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -237,6 +245,13 @@ if __name__ == "__main__":
                     c["customer_division_name"],
                     c["oecd_fos_2007_code"],
                 ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "total_cost_of_active_resources_per_offering"
+            ):
+                total_cost_of_active_resources_per_offering.labels(
+                    c["offering_uuid"],
+                ).set(c["cost"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
