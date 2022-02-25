@@ -131,6 +131,32 @@ if __name__ == "__main__":
         ],
     )
 
+    count_projects_grouped_by_oecd = Gauge(
+        "count_projects_grouped_by_oecd",
+        "Count projects grouped by oecd.",
+        [
+            "oecd_code",
+        ],
+    )
+
+    projects_usages_grouped_by_oecd = Gauge(
+        "projects_usages_grouped_by_oecd",
+        "Projects usages grouped by oecd.",
+        [
+            "oecd_code",
+            "type",
+        ],
+    )
+
+    projects_limits_grouped_by_oecd = Gauge(
+        "projects_limits_grouped_by_oecd",
+        "Projects limits grouped by oecd.",
+        [
+            "oecd_code",
+            "name",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -253,9 +279,32 @@ if __name__ == "__main__":
                     c["offering_uuid"],
                 ).set(c["cost"])
 
+            for c in client.get_marketplace_stats("count_projects_grouped_by_oecd"):
+                count_projects_grouped_by_oecd.labels(
+                    c["oecd_fos_2007_code"],
+                ).set(c["count"])
+
+            for code, usages in client.get_marketplace_stats(
+                "projects_usages_grouped_by_oecd"
+            ).items():
+                for usage_type, usage in usages.items():
+                    projects_usages_grouped_by_oecd.labels(
+                        code,
+                        usage_type,
+                    ).set(usage)
+
+            for code, limits in client.get_marketplace_stats(
+                "projects_limits_grouped_by_oecd"
+            ).items():
+                for limit_name, limit in limits.items():
+                    projects_limits_grouped_by_oecd.labels(
+                        code,
+                        limit_name,
+                    ).set(limit)
+
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
         except Exception as e:
             logger.error(f"Unable to collect metrics. Exception: {e}")
 
-        sleep(10)
+        sleep(120)
