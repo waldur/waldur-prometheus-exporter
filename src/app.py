@@ -157,6 +157,32 @@ if __name__ == "__main__":
         ],
     )
 
+    count_projects_grouped_by_industry_flag = Gauge(
+        "count_projects_grouped_by_industry_flag",
+        "Count projects grouped by industry flag.",
+        [
+            "is_industry",
+        ],
+    )
+
+    projects_usages_grouped_by_industry_flag = Gauge(
+        "projects_usages_grouped_by_industry_flag",
+        "Projects usages grouped by industry flag.",
+        [
+            "is_industry",
+            "type",
+        ],
+    )
+
+    projects_limits_grouped_by_industry_flag = Gauge(
+        "projects_limits_grouped_by_industry_flag",
+        "Projects limits grouped by industry flag.",
+        [
+            "is_industry",
+            "name",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -299,6 +325,31 @@ if __name__ == "__main__":
                 for limit_name, limit in limits.items():
                     projects_limits_grouped_by_oecd.labels(
                         code,
+                        limit_name,
+                    ).set(limit)
+
+            for c in client.get_marketplace_stats(
+                "count_projects_grouped_by_industry_flag"
+            ):
+                count_projects_grouped_by_industry_flag.labels(
+                    c["is_industry"],
+                ).set(c["count"])
+
+            for is_industry, usages in client.get_marketplace_stats(
+                "projects_usages_grouped_by_industry_flag"
+            ).items():
+                for usage_type, usage in usages.items():
+                    projects_usages_grouped_by_industry_flag.labels(
+                        is_industry,
+                        usage_type,
+                    ).set(usage)
+
+            for is_industry, limits in client.get_marketplace_stats(
+                "projects_limits_grouped_by_industry_flag"
+            ).items():
+                for limit_name, limit in limits.items():
+                    projects_limits_grouped_by_industry_flag.labels(
+                        is_industry,
                         limit_name,
                     ).set(limit)
 
