@@ -295,7 +295,7 @@ if __name__ == "__main__":
                     c["customer_name"],
                     c["customer_division_uuid"],
                     c["customer_division_name"],
-                    c["oecd_fos_2007_code"],
+                    c["oecd_fos_2007_name"],
                 ).set(c["count"])
 
             for c in client.get_marketplace_stats(
@@ -307,7 +307,7 @@ if __name__ == "__main__":
 
             for c in client.get_marketplace_stats("count_projects_grouped_by_oecd"):
                 count_projects_grouped_by_oecd.labels(
-                    c["oecd_fos_2007_code"],
+                    c["oecd_fos_2007_name"],
                 ).set(c["count"])
 
             for code, usages in client.get_marketplace_stats(
