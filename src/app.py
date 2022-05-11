@@ -183,6 +183,15 @@ if __name__ == "__main__":
         ],
     )
 
+    count_unique_users_connected_with_active_resources = Gauge(
+        "count_unique_users_connected_with_active_resources_of_service_provider",
+        "Count unique users connected with active resources of service_provider .",
+        [
+            "customer_uuid",
+            "customer_name",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
@@ -352,6 +361,14 @@ if __name__ == "__main__":
                         is_industry,
                         limit_name,
                     ).set(limit)
+
+            for c in client.get_marketplace_stats(
+                "count_unique_users_connected_with_active_resources_of_service_provider"
+            ):
+                count_unique_users_connected_with_active_resources.labels(
+                    c["customer_uuid"],
+                    c["customer_name"],
+                ).set(c["count_users"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
