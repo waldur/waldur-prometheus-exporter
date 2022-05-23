@@ -65,7 +65,7 @@ if __name__ == "__main__":
     organization_members_count = Gauge(
         "organization_members_count",
         "Count of members for every organization.",
-        ["abbreviation", "name", "uuid"],
+        ["abbreviation", "name", "uuid", "has_resources"],
     )
 
     resources_limits = Gauge(
@@ -241,21 +241,13 @@ if __name__ == "__main__":
                     c["uuid"],
                 ).set(c["count"])
 
-            organization_members_count.clear()
-
             for c in client.get_marketplace_stats("customer_member_count"):
                 organization_members_count.labels(
                     c["abbreviation"],
                     c["name"],
                     c["uuid"],
-                ).inc(c["count"])
-
-            for c in client.get_marketplace_stats("project_member_count"):
-                organization_members_count.labels(
-                    c["abbreviation"],
-                    c["name"],
-                    c["uuid"],
-                ).inc(c["count"])
+                    c["has_resources"],
+                ).set(c["count"])
 
             for c in client.get_marketplace_stats("resources_limits"):
                 resources_limits.labels(
