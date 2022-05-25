@@ -23,10 +23,6 @@ if __name__ == "__main__":
 
     users_total = Gauge("waldur_users_total", "Total count of users")
     customers_total = Gauge("waldur_customers_total", "Total count of organizations")
-    resources_total = Gauge(
-        "waldur_marketplace_resources_total",
-        "Total count of marketplace resources",
-    )
     projects_total = Gauge("waldur_projects_total", "Total count of projects")
     waldur_owners_users_total = Gauge(
         "waldur_owners_users_total", "Total count of users with owner permissions"
@@ -192,13 +188,36 @@ if __name__ == "__main__":
         ],
     )
 
+    count_active_resources_grouped_by_offering = Gauge(
+        "count_active_resources_grouped_by_offering",
+        "Count active resources grouped by offering.",
+        [
+            "uuid",
+            "name",
+        ],
+    )
+
+    count_active_resources_grouped_by_offering_country = Gauge(
+        "count_active_resources_grouped_by_offering_country",
+        "Count active resources grouped by country.",
+        [
+            "country",
+        ],
+    )
+
+    count_active_resources_grouped_by_division = Gauge(
+        "count_active_resources_grouped_by_division",
+        "Count active resources grouped by division.",
+        [
+            "uuid",
+            "name",
+        ],
+    )
+
     while True:
         try:
             users_total.set(client.count_users())
             customers_total.set(client.count_customers())
-            resources_total.set(
-                client.count_marketplace_resources(params={"state": "OK"})
-            )
             projects_total.set(client.count_projects())
             waldur_owners_users_total.set(
                 client.count_customer_permissions(params={"role": "owner"})
@@ -361,6 +380,29 @@ if __name__ == "__main__":
                     c["customer_uuid"],
                     c["customer_name"],
                 ).set(c["count_users"])
+
+            for c in client.get_marketplace_stats(
+                "count_active_resources_grouped_by_offering"
+            ):
+                count_active_resources_grouped_by_offering.labels(
+                    c["uuid"],
+                    c["name"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_active_resources_grouped_by_offering_country"
+            ):
+                count_active_resources_grouped_by_offering_country.labels(
+                    c["country"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_active_resources_grouped_by_division"
+            ):
+                count_active_resources_grouped_by_division.labels(
+                    c["uuid"],
+                    c["name"],
+                ).set(c["count"])
 
         except WaldurClientException as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
