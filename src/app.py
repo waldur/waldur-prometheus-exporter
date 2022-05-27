@@ -127,14 +127,6 @@ if __name__ == "__main__":
         ],
     )
 
-    count_projects_grouped_by_oecd = Gauge(
-        "count_projects_grouped_by_oecd",
-        "Count projects grouped by oecd.",
-        [
-            "oecd_code",
-        ],
-    )
-
     projects_usages_grouped_by_oecd = Gauge(
         "projects_usages_grouped_by_oecd",
         "Projects usages grouped by oecd.",
@@ -150,14 +142,6 @@ if __name__ == "__main__":
         [
             "oecd_code",
             "name",
-        ],
-    )
-
-    count_projects_grouped_by_industry_flag = Gauge(
-        "count_projects_grouped_by_industry_flag",
-        "Count projects grouped by industry flag.",
-        [
-            "is_industry",
         ],
     )
 
@@ -211,6 +195,28 @@ if __name__ == "__main__":
         [
             "uuid",
             "name",
+        ],
+    )
+
+    count_projects_grouped_by_provider_and_oecd = Gauge(
+        "count_projects_grouped_by_provider_and_oecd",
+        "Count projects with active resources grouped by provider and oecd",
+        [
+            "uuid",
+            "name",
+            "abbreviation",
+            "oecd",
+        ],
+    )
+
+    count_projects_grouped_by_provider_and_industry_flag = Gauge(
+        "count_projects_grouped_by_provider_and_industry_flag",
+        "Count projects with active resources grouped by provider and industry flag",
+        [
+            "uuid",
+            "name",
+            "abbreviation",
+            "is_industry",
         ],
     )
 
@@ -325,11 +331,6 @@ if __name__ == "__main__":
                     c["offering_uuid"],
                 ).set(c["cost"])
 
-            for c in client.get_marketplace_stats("count_projects_grouped_by_oecd"):
-                count_projects_grouped_by_oecd.labels(
-                    c["oecd_fos_2007_name"],
-                ).set(c["count"])
-
             for code, usages in client.get_marketplace_stats(
                 "projects_usages_grouped_by_oecd"
             ).items():
@@ -347,13 +348,6 @@ if __name__ == "__main__":
                         code,
                         limit_name,
                     ).set(limit)
-
-            for c in client.get_marketplace_stats(
-                "count_projects_grouped_by_industry_flag"
-            ):
-                count_projects_grouped_by_industry_flag.labels(
-                    c["is_industry"],
-                ).set(c["count"])
 
             for is_industry, usages in client.get_marketplace_stats(
                 "projects_usages_grouped_by_industry_flag"
@@ -402,6 +396,26 @@ if __name__ == "__main__":
                 count_active_resources_grouped_by_division.labels(
                     c["uuid"],
                     c["name"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_projects_grouped_by_provider_and_oecd"
+            ):
+                count_projects_grouped_by_provider_and_oecd.labels(
+                    c["uuid"],
+                    c["name"],
+                    c["abbreviation"],
+                    c["oecd"],
+                ).set(c["count"])
+
+            for c in client.get_marketplace_stats(
+                "count_projects_grouped_by_provider_and_industry_flag"
+            ):
+                count_projects_grouped_by_provider_and_industry_flag.labels(
+                    c["uuid"],
+                    c["name"],
+                    c["abbreviation"],
+                    c["is_industry"],
                 ).set(c["count"])
 
         except WaldurClientException as e:
