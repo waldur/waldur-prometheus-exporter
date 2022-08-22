@@ -82,6 +82,20 @@ if __name__ == "__main__":
         ["offering_uuid", "offering_country", "division_name", "division_uuid", "type"],
     )
 
+    aggregated_usages_per_month = Gauge(
+        "aggregated_usages_per_month",
+        "Aggregated usages per month",
+        [
+            "offering_uuid",
+            "offering_country",
+            "division_name",
+            "division_uuid",
+            "type",
+            "month",
+            "year",
+        ],
+    )
+
     count_users_of_service_provider = Gauge(
         "count_users_of_service_provider",
         "Count of users visible to service provider.",
@@ -290,6 +304,17 @@ if __name__ == "__main__":
                     c["division_name"],
                     c["division_uuid"],
                     c["component_type"],
+                ).set(c["usage"])
+
+            for c in client.get_marketplace_stats("component_usages_per_month"):
+                aggregated_usages_per_month.labels(
+                    c["offering_uuid"],
+                    c["offering_country"],
+                    c["division_name"],
+                    c["division_uuid"],
+                    c["component_type"],
+                    c["month"],
+                    c["year"],
                 ).set(c["usage"])
 
             for c in client.get_marketplace_stats("count_users_of_service_providers"):
