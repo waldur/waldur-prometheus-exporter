@@ -240,36 +240,56 @@ if __name__ == "__main__":
 
     while True:
         try:
+            logger.info("Collecting metrics")
+
+            logger.info("Collecting users_total")
             users_total.set(client.count_users())
+
+            logger.info("Collecting customers_total")
             customers_total.set(client.count_customers())
+
+            logger.info("Collecting projects_total")
             projects_total.set(client.count_projects())
+
+            logger.info("Collecting waldur_owners_users_total")
             waldur_owners_users_total.set(
                 client.count_customer_permissions(params={"role": "owner"})
             )
+
+            logger.info("Collecting waldur_support_users_total")
             waldur_support_users_total.set(
                 client.count_users(params={"is_support": "true", "is_active": "true"})
             )
+
+            logger.info("Collecting waldur_local_users_total")
             waldur_local_users_total.set(
                 client.count_users(
                     params={"registration_method": "default", "is_active": "true"}
                 )
             )
+
+            logger.info("Collecting waldur_saml2_users_total")
             waldur_saml2_users_total.set(
                 client.count_users(
                     params={"registration_method": "saml2", "is_active": "true"}
                 )
             )
+
+            logger.info("Collecting waldur_tara_users_total")
             waldur_tara_users_total.set(
                 client.count_users(
                     params={"registration_method": "tara", "is_active": "true"}
                 )
             )
+
+            logger.info("Collecting waldur_eduteams_users_total")
             waldur_eduteams_users_total.set(
                 client.count_users(
                     params={"registration_method": "eduteams", "is_active": "true"}
                 )
             )
 
+            logger.info("Collecting organization_project_count")
             for c in client.get_marketplace_stats("organization_project_count"):
                 organization_project_count.labels(
                     c["abbreviation"],
@@ -277,6 +297,7 @@ if __name__ == "__main__":
                     c["uuid"],
                 ).set(c["count"])
 
+            logger.info("Collecting organization_resource_count")
             for c in client.get_marketplace_stats("organization_resource_count"):
                 organization_resource_count.labels(
                     c["abbreviation"],
@@ -284,6 +305,7 @@ if __name__ == "__main__":
                     c["uuid"],
                 ).set(c["count"])
 
+            logger.info("Collecting organization_members_count")
             for c in client.get_marketplace_stats("customer_member_count"):
                 organization_members_count.labels(
                     c["abbreviation"],
@@ -292,6 +314,7 @@ if __name__ == "__main__":
                     c["has_resources"],
                 ).set(c["count"])
 
+            logger.info("Collecting resources_limits")
             for c in client.get_marketplace_stats("resources_limits"):
                 resources_limits.labels(
                     c["offering_uuid"],
@@ -301,6 +324,7 @@ if __name__ == "__main__":
                     c["name"],
                 ).set(c["value"])
 
+            logger.info("Collecting aggregated_usages")
             for c in client.get_marketplace_stats("component_usages"):
                 aggregated_usages.labels(
                     c["offering_uuid"],
@@ -310,6 +334,7 @@ if __name__ == "__main__":
                     c["component_type"],
                 ).set(c["usage"])
 
+            logger.info("Collecting aggregated_usages_per_month")
             for c in client.get_marketplace_stats("component_usages_per_month"):
                 aggregated_usages_per_month.labels(
                     c["offering_uuid"],
@@ -321,6 +346,7 @@ if __name__ == "__main__":
                     c["year"],
                 ).set(c["usage"])
 
+            logger.info("Collecting count_users_of_service_provider")
             for c in client.get_marketplace_stats("count_users_of_service_providers"):
                 count_users_of_service_provider.labels(
                     c["service_provider_uuid"],
@@ -330,6 +356,7 @@ if __name__ == "__main__":
                     c["customer_division_name"],
                 ).set(c["count"])
 
+            logger.info("Collecting count_projects_of_service_provider")
             for c in client.get_marketplace_stats(
                 "count_projects_of_service_providers"
             ):
@@ -341,6 +368,7 @@ if __name__ == "__main__":
                     c["customer_division_name"],
                 ).set(c["count"])
 
+            logger.info("Collecting count_projects_of_service_provider_grouped_by_oecd")
             for c in client.get_marketplace_stats(
                 "count_projects_of_service_providers_grouped_by_oecd"
             ):
@@ -353,6 +381,7 @@ if __name__ == "__main__":
                     c["oecd_fos_2007_name"],
                 ).set(c["count"])
 
+            logger.info("Collecting total_cost_of_active_resources_per_offering")
             for c in client.get_marketplace_stats(
                 "total_cost_of_active_resources_per_offering"
             ):
@@ -360,6 +389,7 @@ if __name__ == "__main__":
                     c["offering_uuid"],
                 ).set(c["cost"])
 
+            logger.info("Collecting projects_usages_grouped_by_oecd")
             for code, usages in client.get_marketplace_stats(
                 "projects_usages_grouped_by_oecd"
             ).items():
@@ -369,6 +399,7 @@ if __name__ == "__main__":
                         usage_type,
                     ).set(usage)
 
+            logger.info("Collecting projects_limits_grouped_by_oecd")
             for code, limits in client.get_marketplace_stats(
                 "projects_limits_grouped_by_oecd"
             ).items():
@@ -378,6 +409,7 @@ if __name__ == "__main__":
                         limit_name,
                     ).set(limit)
 
+            logger.info("Collecting projects_usages_grouped_by_industry_flag")
             for is_industry, usages in client.get_marketplace_stats(
                 "projects_usages_grouped_by_industry_flag"
             ).items():
@@ -387,6 +419,7 @@ if __name__ == "__main__":
                         usage_type,
                     ).set(usage)
 
+            logger.info("Collecting projects_limits_grouped_by_industry_flag")
             for is_industry, limits in client.get_marketplace_stats(
                 "projects_limits_grouped_by_industry_flag"
             ).items():
@@ -396,6 +429,7 @@ if __name__ == "__main__":
                         limit_name,
                     ).set(limit)
 
+            logger.info("Collecting count_unique_users_connected_with_active_resources")
             for c in client.get_marketplace_stats(
                 "count_unique_users_connected_with_active_resources_of_service_provider"
             ):
@@ -406,6 +440,7 @@ if __name__ == "__main__":
 
             total_active_resources = 0
 
+            logger.info("Collecting count_active_resources_grouped_by_offering")
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_offering"
             ):
@@ -416,8 +451,10 @@ if __name__ == "__main__":
 
                 total_active_resources += c["count"]
 
+            logger.info("Collecting waldur_marketplace_resources_total")
             waldur_marketplace_resources_total.set(total_active_resources)
 
+            logger.info("Collecting count_active_resources_grouped_by_offering_country")
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_offering_country"
             ):
@@ -425,6 +462,7 @@ if __name__ == "__main__":
                     c["country"],
                 ).set(c["count"])
 
+            logger.info("Collecting count_active_resources_grouped_by_division")
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_division"
             ):
@@ -433,6 +471,7 @@ if __name__ == "__main__":
                     c["name"],
                 ).set(c["count"])
 
+            logger.info("Collecting count_projects_grouped_by_provider_and_oecd")
             for c in client.get_marketplace_stats(
                 "count_projects_grouped_by_provider_and_oecd"
             ):
@@ -443,6 +482,9 @@ if __name__ == "__main__":
                     c["oecd"],
                 ).set(c["count"])
 
+            logger.info(
+                "Collecting count_projects_grouped_by_provider_and_industry_flag"
+            )
             for c in client.get_marketplace_stats(
                 "count_projects_grouped_by_provider_and_industry_flag"
             ):
