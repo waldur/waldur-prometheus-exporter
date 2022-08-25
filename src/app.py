@@ -45,6 +45,10 @@ if __name__ == "__main__":
         "waldur_eduteams_users_total",
         "Total count of users with eduteams registration method",
     )
+    waldur_marketplace_resources_total = Gauge(
+        "waldur_marketplace_resources_total",
+        "Total count of active resources",
+    )
 
     organization_project_count = Gauge(
         "organization_project_count",
@@ -400,6 +404,8 @@ if __name__ == "__main__":
                     c["customer_name"],
                 ).set(c["count_users"])
 
+            total_active_resources = 0
+
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_offering"
             ):
@@ -407,6 +413,10 @@ if __name__ == "__main__":
                     c["uuid"],
                     c["name"],
                 ).set(c["count"])
+
+                total_active_resources += c["count"]
+
+            waldur_marketplace_resources_total.set(total_active_resources)
 
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_offering_country"
