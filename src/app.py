@@ -196,6 +196,7 @@ if __name__ == "__main__":
         [
             "uuid",
             "name",
+            "country",
         ],
     )
 
@@ -447,6 +448,7 @@ if __name__ == "__main__":
                 count_active_resources_grouped_by_offering.labels(
                     c["uuid"],
                     c["name"],
+                    c["country"],
                 ).set(c["count"])
 
                 total_active_resources += c["count"]
