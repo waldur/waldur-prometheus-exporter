@@ -1,2 +1,2 @@
 prometheus-client==0.11.0
-git+https://github.com/waldur/ansible-waldur-module.git
+git+https://github.com/waldur/python-waldur-client.git
