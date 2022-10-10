@@ -7,6 +7,8 @@ include:
     file: "/templates/test/lint-dockerfile.yaml"
   - project: "waldur/waldur-pipelines"
     file: "/templates/release/build-and-push-docker-image.yml"
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/release/publish.yml"
 
 Run linters:
   image: "$CI_REGISTRY/waldur/waldur-pipelines/python:3.8"
