@@ -6,8 +6,6 @@ include:
   - project: "waldur/waldur-pipelines"
     file: "/templates/test/lint-dockerfile.yaml"
   - project: "waldur/waldur-pipelines"
-    file: "/templates/release/build-and-push-docker-image.yml"
-  - project: "waldur/waldur-pipelines"
     file: "/templates/release/publish.yml"
 
 Run linters:
