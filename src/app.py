@@ -86,6 +86,12 @@ if __name__ == "__main__":
         ["offering_uuid", "offering_country", "division_name", "division_uuid", "type"],
     )
 
+    component_usages_per_project = Gauge(
+        "component_usages_per_project",
+        "Component usages per project",
+        ["project_uuid", "component_type"],
+    )
+
     aggregated_usages_per_month = Gauge(
         "aggregated_usages_per_month",
         "Aggregated usages per month",
@@ -332,6 +338,13 @@ if __name__ == "__main__":
                     c["offering_country"],
                     c["division_name"],
                     c["division_uuid"],
+                    c["component_type"],
+                ).set(c["usage"])
+
+            logger.info("Collecting component_usages_per_project")
+            for c in client.get_marketplace_stats("component_usages_per_project"):
+                component_usages_per_project.labels(
+                    c["project_uuid"],
                     c["component_type"],
                 ).set(c["usage"])
 
