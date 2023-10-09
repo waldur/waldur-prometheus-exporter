@@ -259,9 +259,14 @@ if __name__ == "__main__":
             projects_total.set(client.count_projects())
 
             logger.info("Collecting waldur_owners_users_total")
-            waldur_owners_users_total.set(
-                client.count_customer_permissions(params={"role": "owner"})
-            )
+            roles = client.get_roles()
+            owners_count = [
+                role["users_count"]
+                for role in roles
+                if role["name"] == "CUSTOMER.OWNER"
+            ]
+            if owners_count:
+                waldur_owners_users_total.set(owners_count[0])
 
             logger.info("Collecting waldur_support_users_total")
             waldur_support_users_total.set(
