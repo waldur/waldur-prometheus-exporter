@@ -83,7 +83,13 @@ if __name__ == "__main__":
     aggregated_usages = Gauge(
         "aggregated_usages",
         "Aggregated usages",
-        ["offering_uuid", "offering_country", "organization_group_name", "organization_group_uuid", "type"],
+        [
+            "offering_uuid",
+            "offering_country",
+            "organization_group_name",
+            "organization_group_uuid",
+            "type",
+        ],
     )
 
     component_usages_per_project = Gauge(
@@ -482,7 +488,9 @@ if __name__ == "__main__":
                     c["country"],
                 ).set(c["count"])
 
-            logger.info("Collecting count_active_resources_grouped_by_organization_group")
+            logger.info(
+                "Collecting count_active_resources_grouped_by_organization_group"
+            )
             for c in client.get_marketplace_stats(
                 "count_active_resources_grouped_by_organization_group"
             ):
