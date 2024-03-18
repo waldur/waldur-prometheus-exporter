@@ -74,8 +74,8 @@ if __name__ == "__main__":
         [
             "offering_uuid",
             "offering_country",
-            "division_name",
-            "division_uuid",
+            "organization_group_name",
+            "organization_group_name_uuid",
             "limit_name",
         ],
     )
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     aggregated_usages = Gauge(
         "aggregated_usages",
         "Aggregated usages",
-        ["offering_uuid", "offering_country", "division_name", "division_uuid", "type"],
+        ["offering_uuid", "offering_country", "organization_group_name", "organization_group_uuid", "type"],
     )
 
     component_usages_per_project = Gauge(
@@ -98,8 +98,8 @@ if __name__ == "__main__":
         [
             "offering_uuid",
             "offering_country",
-            "division_name",
-            "division_uuid",
+            "organization_group_name",
+            "organization_group_uuid",
             "type",
             "month",
             "year",
@@ -113,8 +113,8 @@ if __name__ == "__main__":
             "service_provider_uuid",
             "customer_uuid",
             "customer_name",
-            "customer_division_uuid",
-            "customer_division_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
         ],
     )
 
@@ -125,8 +125,8 @@ if __name__ == "__main__":
             "service_provider_uuid",
             "customer_uuid",
             "customer_name",
-            "customer_division_uuid",
-            "customer_division_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
         ],
     )
 
@@ -137,8 +137,8 @@ if __name__ == "__main__":
             "service_provider_uuid",
             "customer_uuid",
             "customer_name",
-            "customer_division_uuid",
-            "customer_division_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
             "oecd_code",
         ],
     )
@@ -214,9 +214,9 @@ if __name__ == "__main__":
         ],
     )
 
-    count_active_resources_grouped_by_division = Gauge(
-        "count_active_resources_grouped_by_division",
-        "Count active resources grouped by division.",
+    count_active_resources_grouped_by_organization_group = Gauge(
+        "count_active_resources_grouped_by_organization_group",
+        "Count active resources grouped by organization_group.",
         [
             "uuid",
             "name",
@@ -331,8 +331,8 @@ if __name__ == "__main__":
                 resources_limits.labels(
                     c["offering_uuid"],
                     c["offering_country"],
-                    c["division_name"],
-                    c["division_uuid"],
+                    c["organization_group_name"],
+                    c["organization_group_uuid"],
                     c["name"],
                 ).set(c["value"])
 
@@ -341,8 +341,8 @@ if __name__ == "__main__":
                 aggregated_usages.labels(
                     c["offering_uuid"],
                     c["offering_country"],
-                    c["division_name"],
-                    c["division_uuid"],
+                    c["organization_group_name"],
+                    c["organization_group_uuid"],
                     c["component_type"],
                 ).set(c["usage"])
 
@@ -358,8 +358,8 @@ if __name__ == "__main__":
                 aggregated_usages_per_month.labels(
                     c["offering_uuid"],
                     c["offering_country"],
-                    c["division_name"],
-                    c["division_uuid"],
+                    c["organization_group_name"],
+                    c["organization_group_uuid"],
                     c["component_type"],
                     c["month"],
                     c["year"],
@@ -371,8 +371,8 @@ if __name__ == "__main__":
                     c["service_provider_uuid"],
                     c["customer_uuid"],
                     c["customer_name"],
-                    c["customer_division_uuid"],
-                    c["customer_division_name"],
+                    c["customer_organization_group_uuid"],
+                    c["customer_organization_group_name"],
                 ).set(c["count"])
 
             logger.info("Collecting count_projects_of_service_provider")
@@ -383,8 +383,8 @@ if __name__ == "__main__":
                     c["service_provider_uuid"],
                     c["customer_uuid"],
                     c["customer_name"],
-                    c["customer_division_uuid"],
-                    c["customer_division_name"],
+                    c["customer_organization_group_uuid"],
+                    c["customer_organization_group_name"],
                 ).set(c["count"])
 
             logger.info("Collecting count_projects_of_service_provider_grouped_by_oecd")
@@ -395,8 +395,8 @@ if __name__ == "__main__":
                     c["service_provider_uuid"],
                     c["customer_uuid"],
                     c["customer_name"],
-                    c["customer_division_uuid"],
-                    c["customer_division_name"],
+                    c["customer_organization_group_uuid"],
+                    c["customer_organization_group_name"],
                     c["oecd_fos_2007_name"],
                 ).set(c["count"])
 
@@ -482,11 +482,11 @@ if __name__ == "__main__":
                     c["country"],
                 ).set(c["count"])
 
-            logger.info("Collecting count_active_resources_grouped_by_division")
+            logger.info("Collecting count_active_resources_grouped_by_organization_group")
             for c in client.get_marketplace_stats(
-                "count_active_resources_grouped_by_division"
+                "count_active_resources_grouped_by_organization_group"
             ):
-                count_active_resources_grouped_by_division.labels(
+                count_active_resources_grouped_by_organization_group.labels(
                     c["uuid"],
                     c["name"],
                 ).set(c["count"])
