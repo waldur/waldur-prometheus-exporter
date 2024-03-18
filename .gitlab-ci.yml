@@ -9,7 +9,7 @@ include:
     file: "/templates/release/publish.yml"
 
 Run linters:
-  image: "registry.hpc.ut.ee/mirror/library/python:3.8"
+  image: "registry.hpc.ut.ee/mirror/library/python:3.11"
   stage: test
   interruptible: true
   rules:

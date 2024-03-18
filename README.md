@@ -10,4 +10,4 @@ Installation of dependencies:
 pip install -r requirements.txt
 ```
 
-The supported version of python is `3.8+`.
+The supported version of python is `3.11+`.
