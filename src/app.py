@@ -265,7 +265,7 @@ if __name__ == "__main__":
             projects_total.set(client.count_projects())
 
             logger.info("Collecting waldur_owners_users_total")
-            roles = client.get_roles()
+            roles = client.get_roles(params={"page_size": 200})
             owners_count = [
                 role["users_count"]
                 for role in roles
