@@ -239,7 +239,16 @@ if __name__ == "__main__":
             "oecd",
         ],
     )
-
+    offerings_counter_stats = Gauge(
+        "offerings_counter_stats",
+        "Count of offerings grouped by service provider and category",
+        [
+            "service_provider_uuid",
+            "service_provider_name",
+            "category_uuid",
+            "category_title",
+        ],
+    )
     count_projects_grouped_by_provider_and_industry_flag = Gauge(
         "count_projects_grouped_by_provider_and_industry_flag",
         "Count projects with active resources grouped by provider and industry flag",
@@ -413,6 +422,15 @@ if __name__ == "__main__":
                 total_cost_of_active_resources_per_offering.labels(
                     c["offering_uuid"],
                 ).set(c["cost"])
+
+            logger.info("Collecting offerings_counter_stats")
+            for c in client.get_marketplace_stats("offerings_counter_stats"):
+                offerings_counter_stats.labels(
+                    c["service_provider_uuid"],
+                    c["service_provider_name"],
+                    c["category_uuid"],
+                    c["category_title"],
+                ).set(c["count"])
 
             logger.info("Collecting projects_usages_grouped_by_oecd")
             for code, usages in client.get_marketplace_stats(
