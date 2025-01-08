@@ -334,6 +334,7 @@ if __name__ == "__main__":
 
             logger.info("Collecting organization_members_count")
             for c in client.get_marketplace_stats("customer_member_count"):
+                count = c["count"] or 0
                 organization_members_count.labels(
                     c["abbreviation"],
                     c["name"],
