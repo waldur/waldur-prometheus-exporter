@@ -1,2 +1,2 @@
 prometheus-client==0.11.0
-git+https://github.com/waldur/python-waldur-client.git
+git+https://github.com/waldur/py-client.git@d2adb3782fa1d9c273c1c4274a7f8fdbfe3a7559
