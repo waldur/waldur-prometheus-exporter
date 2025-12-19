@@ -378,7 +378,7 @@ if __name__ == "__main__":
             projects_total.set(projects_count.sync(client=client))
 
             logger.info("Collecting waldur_owners_users_total")
-            roles = roles_list.sync(client=client, page_size=200)
+            roles = roles_list.sync_all(client=client)
             if roles:
                 owners_count = [
                     role.users_count for role in roles if role.name == "CUSTOMER.OWNER"
@@ -487,9 +487,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting aggregated_usages_per_month")
             for monthly_usage in (
-                marketplace_stats_component_usages_per_month_list.sync(
+                marketplace_stats_component_usages_per_month_list.sync_all(
                     client=client,
-                    page_size=1000,
                 )
                 or []
             ):
