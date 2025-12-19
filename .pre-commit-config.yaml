@@ -1,6 +1,6 @@
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.12.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
     hooks:
       - id: ruff-format
       - id: ruff
@@ -8,3 +8,11 @@ repos:
           - --fix
           - --exit-non-zero-on-fix
         files: ^src/
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        args: [--config-file=mypy.ini]
+        files: ^src/
+        additional_dependencies:
+          - waldur-api-client

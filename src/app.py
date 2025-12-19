@@ -2,15 +2,13 @@ import logging
 import os
 import sys
 from time import sleep
-from typing import List
 
 from prometheus_client import Gauge, start_http_server
-from waldur_api_client import models
 from waldur_api_client.api.customers import customers_count
-from waldur_api_client.api.marketplace_stats import (
+from waldur_api_client.api.marketplace_stats import (  # type: ignore
+    marketplace_stats_component_usages_list,
     marketplace_stats_component_usages_per_month_list,
     marketplace_stats_component_usages_per_project_list,
-    marketplace_stats_component_usages_list,
     marketplace_stats_count_active_resources_grouped_by_offering_country_list,
     marketplace_stats_count_active_resources_grouped_by_offering_list,
     marketplace_stats_count_active_resources_grouped_by_organization_group_list,
@@ -28,11 +26,11 @@ from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_projects_limits_grouped_by_oecd_retrieve,
     marketplace_stats_projects_usages_grouped_by_industry_flag_retrieve,
     marketplace_stats_projects_usages_grouped_by_oecd_retrieve,
+    marketplace_stats_resource_provisioning_stats_list,
     marketplace_stats_resources_limits_list,
     marketplace_stats_total_cost_of_active_resources_per_offering_list,
 )
 from waldur_api_client.api.projects import projects_count
-
 from waldur_api_client.api.roles import roles_list
 from waldur_api_client.api.users import users_count
 from waldur_api_client.client import AuthenticatedClient
@@ -295,6 +293,77 @@ if __name__ == "__main__":
         ],
     )
 
+    provisioning_count = Gauge(
+        "provisioning_count",
+        "Total finished provisioning attempts (DONE + ERRED)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_success_count = Gauge(
+        "provisioning_success_count",
+        "Total successful provisioning attempts (DONE)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_error_count = Gauge(
+        "provisioning_error_count",
+        "Total failed provisioning attempts (ERRED)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_in_progress_count = Gauge(
+        "provisioning_in_progress_count",
+        "Total currently in-progress provisioning attempts",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_success_rate = Gauge(
+        "provisioning_success_rate",
+        "Rate of successful provisioning (0.0 to 1.0)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    avg_provisioning_duration = Gauge(
+        "avg_provisioning_duration",
+        "Average duration in seconds from Executing to Terminal state",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    avg_pending_duration = Gauge(
+        "avg_pending_duration",
+        "Average duration in seconds from Creation to Executing state",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+
     while True:
         try:
             logger.info("Collecting metrics")
@@ -309,9 +378,7 @@ if __name__ == "__main__":
             projects_total.set(projects_count.sync(client=client))
 
             logger.info("Collecting waldur_owners_users_total")
-            roles: List[models.RoleDetails] | None = roles_list.sync(
-                client=client, page_size=200
-            )
+            roles = roles_list.sync_all(client=client)
             if roles:
                 owners_count = [
                     role.users_count for role in roles if role.name == "CUSTOMER.OWNER"
@@ -353,152 +420,155 @@ if __name__ == "__main__":
             )
 
             logger.info("Collecting organization_project_count")
-            for c in (
+            for org_proj in (
                 marketplace_stats_organization_project_count_list.sync(client=client)
                 or []
             ):
-                organization_project_count.labels(c.abbreviation, c.name, c.uuid).set(
-                    c.count
-                )
+                organization_project_count.labels(
+                    org_proj.abbreviation, org_proj.name, org_proj.uuid
+                ).set(org_proj.count)
 
             logger.info("Collecting organization_resource_count")
-            for c in (
+            for org_res in (
                 marketplace_stats_organization_resource_count_list.sync(client=client)
                 or []
             ):
                 organization_resource_count.labels(
-                    c.abbreviation,
-                    c.name,
-                    c.uuid,
-                ).set(c.count)
+                    org_res.abbreviation,
+                    org_res.name,
+                    org_res.uuid,
+                ).set(org_res.count)
 
             logger.info("Collecting organization_members_count")
-            for c in (
+            for member_count_stat in (
                 marketplace_stats_customer_member_count_list.sync(client=client) or []
             ):
-                member_count = c.count or 0
+                member_count = member_count_stat.count or 0
                 organization_members_count.labels(
-                    c.abbreviation,
-                    c.name,
-                    c.uuid,
-                    c.has_resources,
+                    member_count_stat.abbreviation,
+                    member_count_stat.name,
+                    member_count_stat.uuid,
+                    member_count_stat.has_resources,
                 ).set(member_count)
 
             logger.info("Collecting resources_limits")
-            for c in marketplace_stats_resources_limits_list.sync(client=client) or []:
+            for limit in (
+                marketplace_stats_resources_limits_list.sync(client=client) or []
+            ):
                 resources_limits.labels(
-                    c.offering_uuid,
-                    c.offering_country,
-                    c.organization_group_name,
-                    c.organization_group_uuid,
-                    c.name,
-                ).set(c.value)
+                    limit.offering_uuid,
+                    limit.offering_country,
+                    limit.organization_group_name,
+                    limit.organization_group_uuid,
+                    limit.name,
+                ).set(limit.value)
 
             logger.info("Collecting aggregated_usages")
-            for c in marketplace_stats_component_usages_list.sync(client=client) or []:
+            for usage in (
+                marketplace_stats_component_usages_list.sync(client=client) or []
+            ):
                 aggregated_usages.labels(
-                    c.offering_uuid,
-                    c.offering_country,
-                    c.organization_group_name,
-                    c.organization_group_uuid,
-                    c.component_type,
-                ).set(c.usage)
+                    usage.offering_uuid,
+                    usage.offering_country,
+                    usage.organization_group_name,
+                    usage.organization_group_uuid,
+                    usage.component_type,
+                ).set(usage.usage)
 
             logger.info("Collecting component_usages_per_project")
-            for c in (
+            for proj_usage in (
                 marketplace_stats_component_usages_per_project_list.sync(client=client)
                 or []
             ):
                 component_usages_per_project.labels(
-                    c.project_uuid,
-                    c.component_type,
-                ).set(c.usage)
+                    proj_usage.project_uuid,
+                    proj_usage.component_type,
+                ).set(proj_usage.usage)
 
             logger.info("Collecting aggregated_usages_per_month")
-            for c in (
-                marketplace_stats_component_usages_per_month_list.sync(
+            for monthly_usage in (
+                marketplace_stats_component_usages_per_month_list.sync_all(
                     client=client,
-                    page_size=1000,
                 )
                 or []
             ):
                 aggregated_usages_per_month.labels(
-                    c.offering_uuid,
-                    c.offering_country,
-                    c.organization_group_name,
-                    c.organization_group_uuid,
-                    c.component_type,
-                    c.month,
-                    c.year,
-                ).set(c.usage)
+                    monthly_usage.offering_uuid,
+                    monthly_usage.offering_country,
+                    monthly_usage.organization_group_name,
+                    monthly_usage.organization_group_uuid,
+                    monthly_usage.component_type,
+                    monthly_usage.month,
+                    monthly_usage.year,
+                ).set(monthly_usage.usage)
 
             logger.info("Collecting count_users_of_service_provider")
-            for c in (
+            for sp_user in (
                 marketplace_stats_count_users_of_service_providers_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_users_of_service_provider.labels(
-                    c.service_provider_uuid,
-                    c.customer_uuid,
-                    c.customer_name,
-                    c.customer_organization_group_uuid,
-                    c.customer_organization_group_name,
-                ).set(c.count)
+                    sp_user.service_provider_uuid,
+                    sp_user.customer_uuid,
+                    sp_user.customer_name,
+                    sp_user.customer_organization_group_uuid,
+                    sp_user.customer_organization_group_name,
+                ).set(sp_user.count)
 
             logger.info("Collecting count_projects_of_service_provider")
-            for c in (
+            for sp_proj in (
                 marketplace_stats_count_projects_of_service_providers_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_projects_of_service_provider.labels(
-                    c.service_provider_uuid,
-                    c.customer_uuid,
-                    c.customer_name,
-                    c.customer_organization_group_uuid,
-                    c.customer_organization_group_name,
-                ).set(c.count)
+                    sp_proj.service_provider_uuid,
+                    sp_proj.customer_uuid,
+                    sp_proj.customer_name,
+                    sp_proj.customer_organization_group_uuid,
+                    sp_proj.customer_organization_group_name,
+                ).set(sp_proj.count)
 
             logger.info("Collecting count_projects_of_service_provider_grouped_by_oecd")
-            for c in (
+            for sp_proj_oecd in (
                 marketplace_stats_count_projects_of_service_providers_grouped_by_oecd_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_projects_of_service_provider_grouped_by_oecd.labels(
-                    c.service_provider_uuid,
-                    c.customer_uuid,
-                    c.customer_name,
-                    c.customer_organization_group_uuid,
-                    c.customer_organization_group_name,
-                    c.oecd_fos_2007_name,
-                ).set(c.count)
+                    sp_proj_oecd.service_provider_uuid,
+                    sp_proj_oecd.customer_uuid,
+                    sp_proj_oecd.customer_name,
+                    sp_proj_oecd.customer_organization_group_uuid,
+                    sp_proj_oecd.customer_organization_group_name,
+                    sp_proj_oecd.oecd_fos_2007_name,
+                ).set(sp_proj_oecd.count)
 
             logger.info("Collecting total_cost_of_active_resources_per_offering")
-            for c in (
+            for cost_stat in (
                 marketplace_stats_total_cost_of_active_resources_per_offering_list.sync(
                     client=client
                 )
                 or []
             ):
                 total_cost_of_active_resources_per_offering.labels(
-                    c.offering_uuid,
-                ).set(c.cost)
+                    cost_stat.offering_uuid,
+                ).set(cost_stat.cost)
 
             logger.info("Collecting offerings_counter_stats")
-            for c in (
+            for counter in (
                 marketplace_stats_offerings_counter_stats_list.sync(client=client) or []
             ):
                 offerings_counter_stats.labels(
-                    c.service_provider_uuid,
-                    c.service_provider_name,
-                    c.category_uuid,
-                    c.category_title,
-                ).set(c.count)
+                    counter.service_provider_uuid,
+                    counter.service_provider_name,
+                    counter.category_uuid,
+                    counter.category_title,
+                ).set(counter.count)
 
             logger.info("Collecting projects_usages_grouped_by_oecd")
             result = marketplace_stats_projects_usages_grouped_by_oecd_retrieve.sync(
@@ -556,88 +626,117 @@ if __name__ == "__main__":
                     ).set(limit)
 
             logger.info("Collecting count_unique_users_connected_with_active_resources")
-            for c in (
+            for unique_user in (
                 marketplace_stats_count_unique_users_connected_with_active_resources_of_service_provider_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_unique_users_connected_with_active_resources.labels(
-                    c.customer_uuid,
-                    c.customer_name,
-                ).set(c.count_users)
+                    unique_user.customer_uuid,
+                    unique_user.customer_name,
+                ).set(unique_user.count_users)
 
             total_active_resources = 0
 
             logger.info("Collecting count_active_resources_grouped_by_offering")
-            for c in (
+            for active_res in (
                 marketplace_stats_count_active_resources_grouped_by_offering_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_active_resources_grouped_by_offering.labels(
-                    c.uuid,
-                    c.name,
-                    c.country,
-                ).set(c.count)
+                    active_res.uuid,
+                    active_res.name,
+                    active_res.country,
+                ).set(active_res.count)
 
-                total_active_resources += c.count
+                total_active_resources += active_res.count
 
             logger.info("Collecting waldur_marketplace_resources_total")
             waldur_marketplace_resources_total.set(total_active_resources)
 
             logger.info("Collecting count_active_resources_grouped_by_offering_country")
-            for c in (
+            for country_res in (
                 marketplace_stats_count_active_resources_grouped_by_offering_country_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_active_resources_grouped_by_offering_country.labels(
-                    c.country,
-                ).set(c.count)
+                    country_res.country,
+                ).set(country_res.count)
 
             logger.info(
                 "Collecting count_active_resources_grouped_by_organization_group"
             )
-            for c in (
+            for group_res in (
                 marketplace_stats_count_active_resources_grouped_by_organization_group_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_active_resources_grouped_by_organization_group.labels(
-                    c.uuid,
-                    c.name,
-                ).set(c.count)
+                    group_res.uuid,
+                    group_res.name,
+                ).set(group_res.count)
             logger.info("Collecting count_projects_grouped_by_provider_and_oecd")
-            for c in (
+            for proj_oecd in (
                 marketplace_stats_count_projects_grouped_by_provider_and_oecd_list.sync(
                     client=client
                 )
             ) or []:
                 count_projects_grouped_by_provider_and_oecd.labels(
-                    c.uuid,
-                    c.name,
-                    c.abbreviation,
-                    c.oecd,
-                ).set(c.count)
+                    proj_oecd.uuid,
+                    proj_oecd.name,
+                    proj_oecd.abbreviation,
+                    proj_oecd.oecd,
+                ).set(proj_oecd.count)
             logger.info(
                 "Collecting count_projects_grouped_by_provider_and_industry_flag"
             )
-            for c in (
+            for proj_ind in (
                 marketplace_stats_count_projects_grouped_by_provider_and_industry_flag_list.sync(
                     client=client
                 )
                 or []
             ):
                 count_projects_grouped_by_provider_and_industry_flag.labels(
-                    c.uuid,
-                    c.name,
-                    c.abbreviation,
-                    c.is_industry,
-                ).set(c.count)
+                    proj_ind.uuid,
+                    proj_ind.name,
+                    proj_ind.abbreviation,
+                    proj_ind.is_industry,
+                ).set(proj_ind.count)
+
+            logger.info("Collecting resource_provisioning_stats")
+            for stat in (
+                marketplace_stats_resource_provisioning_stats_list.sync(client=client)
+                or []
+            ):
+                labels = (
+                    stat.offering_uuid,
+                    stat.offering_name,
+                    stat.service_provider_uuid,
+                    stat.service_provider_name,
+                )
+                provisioning_count.labels(*labels).set(stat.provisioning_count)
+                provisioning_success_count.labels(*labels).set(
+                    stat.provisioning_success_count
+                )
+                provisioning_error_count.labels(*labels).set(
+                    stat.provisioning_error_count
+                )
+                provisioning_in_progress_count.labels(*labels).set(
+                    stat.provisioning_in_progress_count
+                )
+                provisioning_success_rate.labels(*labels).set(
+                    stat.provisioning_success_rate
+                )
+                avg_provisioning_duration.labels(*labels).set(
+                    stat.avg_provisioning_duration
+                )
+                avg_pending_duration.labels(*labels).set(stat.avg_pending_duration)
 
         except UnexpectedStatus as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
