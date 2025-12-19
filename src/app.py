@@ -27,6 +27,7 @@ from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_projects_limits_grouped_by_oecd_retrieve,
     marketplace_stats_projects_usages_grouped_by_industry_flag_retrieve,
     marketplace_stats_projects_usages_grouped_by_oecd_retrieve,
+    marketplace_stats_resource_provisioning_stats_list,
     marketplace_stats_resources_limits_list,
     marketplace_stats_total_cost_of_active_resources_per_offering_list,
 )
@@ -290,6 +291,77 @@ if __name__ == "__main__":
             "name",
             "abbreviation",
             "is_industry",
+        ],
+    )
+
+    provisioning_count = Gauge(
+        "provisioning_count",
+        "Total finished provisioning attempts (DONE + ERRED)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_success_count = Gauge(
+        "provisioning_success_count",
+        "Total successful provisioning attempts (DONE)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_error_count = Gauge(
+        "provisioning_error_count",
+        "Total failed provisioning attempts (ERRED)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_in_progress_count = Gauge(
+        "provisioning_in_progress_count",
+        "Total currently in-progress provisioning attempts",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_success_rate = Gauge(
+        "provisioning_success_rate",
+        "Rate of successful provisioning (0.0 to 1.0)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    avg_provisioning_duration = Gauge(
+        "avg_provisioning_duration",
+        "Average duration in seconds from Executing to Terminal state",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    avg_pending_duration = Gauge(
+        "avg_pending_duration",
+        "Average duration in seconds from Creation to Executing state",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
         ],
     )
 
@@ -636,6 +708,33 @@ if __name__ == "__main__":
                     c.abbreviation,
                     c.is_industry,
                 ).set(c.count)
+
+            logger.info("Collecting resource_provisioning_stats")
+            for c in (
+                marketplace_stats_resource_provisioning_stats_list.sync(client=client)
+                or []
+            ):
+                labels = (
+                    c.offering_uuid,
+                    c.offering_name,
+                    c.service_provider_uuid,
+                    c.service_provider_name,
+                )
+                provisioning_count.labels(*labels).set(c.provisioning_count)
+                provisioning_success_count.labels(*labels).set(
+                    c.provisioning_success_count
+                )
+                provisioning_error_count.labels(*labels).set(c.provisioning_error_count)
+                provisioning_in_progress_count.labels(*labels).set(
+                    c.provisioning_in_progress_count
+                )
+                provisioning_success_rate.labels(*labels).set(
+                    c.provisioning_success_rate
+                )
+                avg_provisioning_duration.labels(*labels).set(
+                    c.avg_provisioning_duration
+                )
+                avg_pending_duration.labels(*labels).set(c.avg_pending_duration)
 
         except UnexpectedStatus as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
