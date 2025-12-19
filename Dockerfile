@@ -1,15 +1,11 @@
 # Use to avoid pull rate limit for Docker Hub images
 ARG DOCKER_REGISTRY=docker.io/
-FROM ${DOCKER_REGISTRY}library/python:3.11-alpine
-
-RUN apk update && \
-    apk add --no-cache \
-    git\>=2.45
-
+FROM ${DOCKER_REGISTRY}ghcr.io/astral-sh/uv:python3.11-alpine
 
 COPY . /usr/src/waldur-prometheus-exporter
 
 WORKDIR /usr/src/waldur-prometheus-exporter
-RUN pip install -r requirements.txt --no-cache-dir
+RUN apk add --no-cache git
+RUN uv sync --frozen
 
-CMD [ "python", "src/app.py" ]
+CMD [ "uv", "run", "src/app.py" ]

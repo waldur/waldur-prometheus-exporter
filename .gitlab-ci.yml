@@ -46,8 +46,10 @@ Generate Codebase SBOM:
   before_script:
     - apt-get update
   script:
-    - pip install cyclonedx-bom -r requirements.txt
-    - cyclonedx-py environment -o ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
+    - pip install uv
+    - uv sync
+    - uv run pip install cyclonedx-bom
+    - uv run cyclonedx-py environment -o ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
     - cat ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json | head -n 100
     - echo "SBOM generated. Size:"
     - du -h ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json

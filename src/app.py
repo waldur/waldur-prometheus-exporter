@@ -2,15 +2,14 @@ import logging
 import os
 import sys
 from time import sleep
-from typing import List
 
 from prometheus_client import Gauge, start_http_server
 from waldur_api_client import models
 from waldur_api_client.api.customers import customers_count
 from waldur_api_client.api.marketplace_stats import (
+    marketplace_stats_component_usages_list,
     marketplace_stats_component_usages_per_month_list,
     marketplace_stats_component_usages_per_project_list,
-    marketplace_stats_component_usages_list,
     marketplace_stats_count_active_resources_grouped_by_offering_country_list,
     marketplace_stats_count_active_resources_grouped_by_offering_list,
     marketplace_stats_count_active_resources_grouped_by_organization_group_list,
@@ -32,7 +31,6 @@ from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_total_cost_of_active_resources_per_offering_list,
 )
 from waldur_api_client.api.projects import projects_count
-
 from waldur_api_client.api.roles import roles_list
 from waldur_api_client.api.users import users_count
 from waldur_api_client.client import AuthenticatedClient
@@ -309,7 +307,7 @@ if __name__ == "__main__":
             projects_total.set(projects_count.sync(client=client))
 
             logger.info("Collecting waldur_owners_users_total")
-            roles: List[models.RoleDetails] | None = roles_list.sync(
+            roles: list[models.RoleDetails] | None = roles_list.sync(
                 client=client, page_size=200
             )
             if roles:
