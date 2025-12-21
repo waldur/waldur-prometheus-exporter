@@ -204,6 +204,7 @@ if __name__ == "__main__":
         "Total cost of active resources per offering.",
         [
             "offering_uuid",
+            "offering_name",
         ],
     )
 
@@ -553,6 +554,7 @@ if __name__ == "__main__":
             ):
                 total_cost_of_active_resources_per_offering.labels(
                     cost_stat.offering_uuid,
+                    cost_stat.offering_name,
                 ).set(cost_stat.cost)
 
             logger.info("Collecting offerings_counter_stats")
