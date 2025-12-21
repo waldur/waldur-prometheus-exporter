@@ -5,7 +5,7 @@ from time import sleep
 
 from prometheus_client import Gauge, start_http_server
 from waldur_api_client.api.customers import customers_count
-from waldur_api_client.api.marketplace_stats import (  # type: ignore
+from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_component_usages_list,
     marketplace_stats_component_usages_per_month_list,
     marketplace_stats_component_usages_per_project_list,
@@ -29,6 +29,10 @@ from waldur_api_client.api.marketplace_stats import (  # type: ignore
     marketplace_stats_resource_provisioning_stats_list,
     marketplace_stats_resources_limits_list,
     marketplace_stats_total_cost_of_active_resources_per_offering_list,
+    marketplace_stats_user_affiliation_count_list,
+    marketplace_stats_user_auth_method_count_list,
+    marketplace_stats_user_identity_source_count_list,
+    marketplace_stats_user_organization_count_list,
 )
 from waldur_api_client.api.projects import projects_count
 from waldur_api_client.api.roles import roles_list
@@ -67,20 +71,33 @@ if __name__ == "__main__":
         "waldur_local_users_total",
         "Total count of users with local registration method",
     )
-    waldur_saml2_users_total = Gauge(
-        "waldur_saml2_users_total",
-        "Total count of users with saml2 registration method",
-    )
-    waldur_tara_users_total = Gauge(
-        "waldur_tara_users_total", "Total count of users with tara registration method"
-    )
-    waldur_eduteams_users_total = Gauge(
-        "waldur_eduteams_users_total",
-        "Total count of users with eduteams registration method",
-    )
     waldur_marketplace_resources_total = Gauge(
         "waldur_marketplace_resources_total",
         "Total count of active resources",
+    )
+
+    waldur_user_auth_method_count = Gauge(
+        "waldur_user_auth_method_count",
+        "Total count of users by authentication method",
+        ["method"],
+    )
+
+    waldur_user_identity_source_count = Gauge(
+        "waldur_user_identity_source_count",
+        "Total count of users by identity source",
+        ["identity_source"],
+    )
+
+    waldur_user_organization_count = Gauge(
+        "waldur_user_organization_count",
+        "Total count of users by organization",
+        ["organization"],
+    )
+
+    waldur_user_affiliation_count = Gauge(
+        "waldur_user_affiliation_count",
+        "Total count of users by affiliation",
+        ["affiliation"],
     )
 
     organization_project_count = Gauge(
@@ -395,27 +412,6 @@ if __name__ == "__main__":
             waldur_local_users_total.set(
                 users_count.sync(
                     client=client, registration_method="default", is_active=True
-                )
-            )
-
-            logger.info("Collecting waldur_saml2_users_total")
-            waldur_saml2_users_total.set(
-                users_count.sync(
-                    client=client, registration_method="saml2", is_active=True
-                )
-            )
-
-            logger.info("Collecting waldur_tara_users_total")
-            waldur_tara_users_total.set(
-                users_count.sync(
-                    client=client, registration_method="tara", is_active=True
-                )
-            )
-
-            logger.info("Collecting waldur_eduteams_users_total")
-            waldur_eduteams_users_total.set(
-                users_count.sync(
-                    client=client, registration_method="eduteams", is_active=True
                 )
             )
 
@@ -737,6 +733,39 @@ if __name__ == "__main__":
                     stat.avg_provisioning_duration
                 )
                 avg_pending_duration.labels(*labels).set(stat.avg_pending_duration)
+
+            logger.info("Collecting waldur_user_auth_method_count")
+            for auth_stat in (
+                marketplace_stats_user_auth_method_count_list.sync(client=client) or []
+            ):
+                waldur_user_auth_method_count.labels(auth_stat.method).set(
+                    auth_stat.count
+                )
+
+            logger.info("Collecting waldur_user_identity_source_count")
+            for identity_stat in (
+                marketplace_stats_user_identity_source_count_list.sync(client=client)
+                or []
+            ):
+                waldur_user_identity_source_count.labels(
+                    identity_stat.identity_source
+                ).set(identity_stat.count)
+
+            logger.info("Collecting waldur_user_organization_count")
+            for org_stat in (
+                marketplace_stats_user_organization_count_list.sync(client=client) or []
+            ):
+                waldur_user_organization_count.labels(org_stat.organization).set(
+                    org_stat.count
+                )
+
+            logger.info("Collecting waldur_user_affiliation_count")
+            for aff_stat in (
+                marketplace_stats_user_affiliation_count_list.sync(client=client) or []
+            ):
+                waldur_user_affiliation_count.labels(aff_stat.affiliation).set(
+                    aff_stat.count
+                )
 
         except UnexpectedStatus as e:
             logger.error(f"Unable to collect metrics. Message: {e}")
