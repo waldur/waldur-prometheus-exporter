@@ -15,4 +15,4 @@ repos:
         args: [--config-file=mypy.ini]
         files: ^src/
         additional_dependencies:
-          - waldur-api-client
+          - waldur-api-client @ git+https://github.com/waldur/py-client.git
