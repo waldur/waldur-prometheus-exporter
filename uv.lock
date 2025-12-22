@@ -241,7 +241,7 @@ wheels = [
 [[package]]
 name = "waldur-api-client"
 version = "7.9.5"
-source = { git = "https://github.com/waldur/py-client.git#215e68f3ec10bd9f1c458dfde9443e4ed7f4c7e3" }
+source = { git = "https://github.com/waldur/py-client.git#00c4964c75e3bdc8d96fc40da1841444bc6f2119" }
 dependencies = [
     { name = "attrs" },
     { name = "httpx" },
