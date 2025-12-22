@@ -105,10 +105,20 @@ if __name__ == "__main__":
         "Count of projects for each organization.",
         ["abbreviation", "name", "uuid"],
     )
+    organization_project_count_deprecated = Gauge(
+        "organization_project_count",
+        "Count of projects for each organization. (Deprecated)",
+        ["abbreviation", "name", "uuid"],
+    )
 
     organization_resource_count = Gauge(
         "waldur_organization_resource_count",
         "Count of resources for every organization.",
+        ["abbreviation", "name", "uuid"],
+    )
+    organization_resource_count_deprecated = Gauge(
+        "organization_resource_count",
+        "Count of resources for every organization. (Deprecated)",
         ["abbreviation", "name", "uuid"],
     )
 
@@ -117,10 +127,26 @@ if __name__ == "__main__":
         "Count of members for every organization.",
         ["abbreviation", "name", "uuid", "has_resources"],
     )
+    organization_members_count_deprecated = Gauge(
+        "organization_members_count",
+        "Count of members for every organization. (Deprecated)",
+        ["abbreviation", "name", "uuid", "has_resources"],
+    )
 
     resources_limits = Gauge(
         "waldur_resources_limits",
         "Resources limits",
+        [
+            "offering_uuid",
+            "offering_country",
+            "organization_group_name",
+            "organization_group_name_uuid",
+            "limit_name",
+        ],
+    )
+    resources_limits_deprecated = Gauge(
+        "resources_limits",
+        "Resources limits (Deprecated)",
         [
             "offering_uuid",
             "offering_country",
@@ -141,16 +167,45 @@ if __name__ == "__main__":
             "type",
         ],
     )
+    aggregated_usages_deprecated = Gauge(
+        "aggregated_usages",
+        "Aggregated usages (Deprecated)",
+        [
+            "offering_uuid",
+            "offering_country",
+            "organization_group_name",
+            "organization_group_uuid",
+            "type",
+        ],
+    )
 
     component_usages_per_project = Gauge(
         "waldur_component_usages_per_project",
         "Component usages per project",
         ["project_uuid", "component_type"],
     )
+    component_usages_per_project_deprecated = Gauge(
+        "component_usages_per_project",
+        "Component usages per project (Deprecated)",
+        ["project_uuid", "component_type"],
+    )
 
     aggregated_usages_per_month = Gauge(
         "waldur_aggregated_usages_per_month",
         "Aggregated usages per month",
+        [
+            "offering_uuid",
+            "offering_country",
+            "organization_group_name",
+            "organization_group_uuid",
+            "type",
+            "month",
+            "year",
+        ],
+    )
+    aggregated_usages_per_month_deprecated = Gauge(
+        "aggregated_usages_per_month",
+        "Aggregated usages per month (Deprecated)",
         [
             "offering_uuid",
             "offering_country",
@@ -173,10 +228,32 @@ if __name__ == "__main__":
             "customer_organization_group_name",
         ],
     )
+    count_users_of_service_provider_deprecated = Gauge(
+        "count_users_of_service_provider",
+        "Count of users visible to service provider. (Deprecated)",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
+        ],
+    )
 
     count_projects_of_service_provider = Gauge(
         "waldur_count_projects_of_service_provider",
         "Count of projects visible to service provider.",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
+        ],
+    )
+    count_projects_of_service_provider_deprecated = Gauge(
+        "count_projects_of_service_provider",
+        "Count of projects visible to service provider. (Deprecated)",
         [
             "service_provider_uuid",
             "customer_uuid",
@@ -198,10 +275,30 @@ if __name__ == "__main__":
             "oecd_code",
         ],
     )
+    count_projects_of_service_provider_grouped_by_oecd_deprecated = Gauge(
+        "count_projects_of_service_provider_grouped_by_oecd",
+        "Count of projects visible to service provider and grouped by oecd. (Deprecated)",
+        [
+            "service_provider_uuid",
+            "customer_uuid",
+            "customer_name",
+            "customer_organization_group_uuid",
+            "customer_organization_group_name",
+            "oecd_code",
+        ],
+    )
 
     total_cost_of_active_resources_per_offering = Gauge(
         "waldur_total_cost_of_active_resources_per_offering",
         "Total cost of active resources per offering.",
+        [
+            "offering_uuid",
+            "offering_name",
+        ],
+    )
+    total_cost_of_active_resources_per_offering_deprecated = Gauge(
+        "total_cost_of_active_resources_per_offering",
+        "Total cost of active resources per offering. (Deprecated)",
         [
             "offering_uuid",
             "offering_name",
@@ -216,10 +313,26 @@ if __name__ == "__main__":
             "type",
         ],
     )
+    projects_usages_grouped_by_oecd_deprecated = Gauge(
+        "projects_usages_grouped_by_oecd",
+        "Projects usages grouped by oecd. (Deprecated)",
+        [
+            "oecd_code",
+            "type",
+        ],
+    )
 
     projects_limits_grouped_by_oecd = Gauge(
         "waldur_projects_limits_grouped_by_oecd",
         "Projects limits grouped by oecd.",
+        [
+            "oecd_code",
+            "name",
+        ],
+    )
+    projects_limits_grouped_by_oecd_deprecated = Gauge(
+        "projects_limits_grouped_by_oecd",
+        "Projects limits grouped by oecd. (Deprecated)",
         [
             "oecd_code",
             "name",
@@ -234,6 +347,14 @@ if __name__ == "__main__":
             "type",
         ],
     )
+    projects_usages_grouped_by_industry_flag_deprecated = Gauge(
+        "projects_usages_grouped_by_industry_flag",
+        "Projects usages grouped by industry flag. (Deprecated)",
+        [
+            "is_industry",
+            "type",
+        ],
+    )
 
     projects_limits_grouped_by_industry_flag = Gauge(
         "waldur_projects_limits_grouped_by_industry_flag",
@@ -243,10 +364,26 @@ if __name__ == "__main__":
             "name",
         ],
     )
+    projects_limits_grouped_by_industry_flag_deprecated = Gauge(
+        "projects_limits_grouped_by_industry_flag",
+        "Projects limits grouped by industry flag. (Deprecated)",
+        [
+            "is_industry",
+            "name",
+        ],
+    )
 
     count_unique_users_connected_with_active_resources = Gauge(
         "waldur_count_unique_users_connected_with_active_resources_of_service_provider",
         "Count unique users connected with active resources of service_provider .",
+        [
+            "customer_uuid",
+            "customer_name",
+        ],
+    )
+    count_unique_users_connected_with_active_resources_deprecated = Gauge(
+        "count_unique_users_connected_with_active_resources_of_service_provider",
+        "Count unique users connected with active resources of service_provider . (Deprecated)",
         [
             "customer_uuid",
             "customer_name",
@@ -262,10 +399,26 @@ if __name__ == "__main__":
             "country",
         ],
     )
+    count_active_resources_grouped_by_offering_deprecated = Gauge(
+        "count_active_resources_grouped_by_offering",
+        "Count active resources grouped by offering. (Deprecated)",
+        [
+            "uuid",
+            "name",
+            "country",
+        ],
+    )
 
     count_active_resources_grouped_by_offering_country = Gauge(
         "waldur_count_active_resources_grouped_by_offering_country",
         "Count active resources grouped by country.",
+        [
+            "country",
+        ],
+    )
+    count_active_resources_grouped_by_offering_country_deprecated = Gauge(
+        "count_active_resources_grouped_by_offering_country",
+        "Count active resources grouped by country. (Deprecated)",
         [
             "country",
         ],
@@ -279,10 +432,28 @@ if __name__ == "__main__":
             "name",
         ],
     )
+    count_active_resources_grouped_by_organization_group_deprecated = Gauge(
+        "count_active_resources_grouped_by_organization_group",
+        "Count active resources grouped by organization_group. (Deprecated)",
+        [
+            "uuid",
+            "name",
+        ],
+    )
 
     count_projects_grouped_by_provider_and_oecd = Gauge(
         "waldur_count_projects_grouped_by_provider_and_oecd",
         "Count projects with active resources grouped by provider and oecd",
+        [
+            "uuid",
+            "name",
+            "abbreviation",
+            "oecd",
+        ],
+    )
+    count_projects_grouped_by_provider_and_oecd_deprecated = Gauge(
+        "count_projects_grouped_by_provider_and_oecd",
+        "Count projects with active resources grouped by provider and oecd (Deprecated)",
         [
             "uuid",
             "name",
@@ -300,9 +471,29 @@ if __name__ == "__main__":
             "category_title",
         ],
     )
+    offerings_counter_stats_deprecated = Gauge(
+        "offerings_counter_stats",
+        "Count of offerings grouped by service provider and category (Deprecated)",
+        [
+            "service_provider_uuid",
+            "service_provider_name",
+            "category_uuid",
+            "category_title",
+        ],
+    )
     count_projects_grouped_by_provider_and_industry_flag = Gauge(
         "waldur_count_projects_grouped_by_provider_and_industry_flag",
         "Count projects with active resources grouped by provider and industry flag",
+        [
+            "uuid",
+            "name",
+            "abbreviation",
+            "is_industry",
+        ],
+    )
+    count_projects_grouped_by_provider_and_industry_flag_deprecated = Gauge(
+        "count_projects_grouped_by_provider_and_industry_flag",
+        "Count projects with active resources grouped by provider and industry flag (Deprecated)",
         [
             "uuid",
             "name",
@@ -321,9 +512,29 @@ if __name__ == "__main__":
             "service_provider_name",
         ],
     )
+    provisioning_count_deprecated = Gauge(
+        "provisioning_count",
+        "Total finished provisioning attempts (DONE + ERRED) (Deprecated)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
     provisioning_success_count = Gauge(
         "waldur_provisioning_success_count",
         "Total successful provisioning attempts (DONE)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_success_count_deprecated = Gauge(
+        "provisioning_success_count",
+        "Total successful provisioning attempts (DONE) (Deprecated)",
         [
             "offering_uuid",
             "offering_name",
@@ -341,9 +552,29 @@ if __name__ == "__main__":
             "service_provider_name",
         ],
     )
+    provisioning_error_count_deprecated = Gauge(
+        "provisioning_error_count",
+        "Total failed provisioning attempts (ERRED) (Deprecated)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
     provisioning_in_progress_count = Gauge(
         "waldur_provisioning_in_progress_count",
         "Total currently in-progress provisioning attempts",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    provisioning_in_progress_count_deprecated = Gauge(
+        "provisioning_in_progress_count",
+        "Total currently in-progress provisioning attempts (Deprecated)",
         [
             "offering_uuid",
             "offering_name",
@@ -361,6 +592,16 @@ if __name__ == "__main__":
             "service_provider_name",
         ],
     )
+    provisioning_success_rate_deprecated = Gauge(
+        "provisioning_success_rate",
+        "Rate of successful provisioning (0.0 to 1.0) (Deprecated)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
     avg_provisioning_duration = Gauge(
         "waldur_avg_provisioning_duration",
         "Average duration in seconds from Executing to Terminal state",
@@ -371,9 +612,29 @@ if __name__ == "__main__":
             "service_provider_name",
         ],
     )
+    avg_provisioning_duration_deprecated = Gauge(
+        "avg_provisioning_duration",
+        "Average duration in seconds from Executing to Terminal state (Deprecated)",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
     avg_pending_duration = Gauge(
         "waldur_avg_pending_duration",
         "Average duration in seconds from Creation to Executing state",
+        [
+            "offering_uuid",
+            "offering_name",
+            "service_provider_uuid",
+            "service_provider_name",
+        ],
+    )
+    avg_pending_duration_deprecated = Gauge(
+        "avg_pending_duration",
+        "Average duration in seconds from Creation to Executing state (Deprecated)",
         [
             "offering_uuid",
             "offering_name",
@@ -424,6 +685,9 @@ if __name__ == "__main__":
                 organization_project_count.labels(
                     org_proj.abbreviation, org_proj.name, org_proj.uuid
                 ).set(org_proj.count)
+                organization_project_count_deprecated.labels(
+                    org_proj.abbreviation, org_proj.name, org_proj.uuid
+                ).set(org_proj.count)
 
             logger.info("Collecting organization_resource_count")
             for org_res in (
@@ -431,6 +695,11 @@ if __name__ == "__main__":
                 or []
             ):
                 organization_resource_count.labels(
+                    org_res.abbreviation,
+                    org_res.name,
+                    org_res.uuid,
+                ).set(org_res.count)
+                organization_resource_count_deprecated.labels(
                     org_res.abbreviation,
                     org_res.name,
                     org_res.uuid,
@@ -447,12 +716,25 @@ if __name__ == "__main__":
                     member_count_stat.uuid,
                     member_count_stat.has_resources,
                 ).set(member_count)
+                organization_members_count_deprecated.labels(
+                    member_count_stat.abbreviation,
+                    member_count_stat.name,
+                    member_count_stat.uuid,
+                    member_count_stat.has_resources,
+                ).set(member_count)
 
             logger.info("Collecting resources_limits")
             for limit in (
                 marketplace_stats_resources_limits_list.sync(client=client) or []
             ):
                 resources_limits.labels(
+                    limit.offering_uuid,
+                    limit.offering_country,
+                    limit.organization_group_name,
+                    limit.organization_group_uuid,
+                    limit.name,
+                ).set(limit.value)
+                resources_limits_deprecated.labels(
                     limit.offering_uuid,
                     limit.offering_country,
                     limit.organization_group_name,
@@ -471,6 +753,13 @@ if __name__ == "__main__":
                     usage.organization_group_uuid,
                     usage.component_type,
                 ).set(usage.usage)
+                aggregated_usages_deprecated.labels(
+                    usage.offering_uuid,
+                    usage.offering_country,
+                    usage.organization_group_name,
+                    usage.organization_group_uuid,
+                    usage.component_type,
+                ).set(usage.usage)
 
             logger.info("Collecting component_usages_per_project")
             for proj_usage in (
@@ -478,6 +767,10 @@ if __name__ == "__main__":
                 or []
             ):
                 component_usages_per_project.labels(
+                    proj_usage.project_uuid,
+                    proj_usage.component_type,
+                ).set(proj_usage.usage)
+                component_usages_per_project_deprecated.labels(
                     proj_usage.project_uuid,
                     proj_usage.component_type,
                 ).set(proj_usage.usage)
@@ -490,6 +783,15 @@ if __name__ == "__main__":
                 or []
             ):
                 aggregated_usages_per_month.labels(
+                    monthly_usage.offering_uuid,
+                    monthly_usage.offering_country,
+                    monthly_usage.organization_group_name,
+                    monthly_usage.organization_group_uuid,
+                    monthly_usage.component_type,
+                    monthly_usage.month,
+                    monthly_usage.year,
+                ).set(monthly_usage.usage)
+                aggregated_usages_per_month_deprecated.labels(
                     monthly_usage.offering_uuid,
                     monthly_usage.offering_country,
                     monthly_usage.organization_group_name,
@@ -513,6 +815,13 @@ if __name__ == "__main__":
                     sp_user.customer_organization_group_uuid,
                     sp_user.customer_organization_group_name,
                 ).set(sp_user.count)
+                count_users_of_service_provider_deprecated.labels(
+                    sp_user.service_provider_uuid,
+                    sp_user.customer_uuid,
+                    sp_user.customer_name,
+                    sp_user.customer_organization_group_uuid,
+                    sp_user.customer_organization_group_name,
+                ).set(sp_user.count)
 
             logger.info("Collecting count_projects_of_service_provider")
             for sp_proj in (
@@ -522,6 +831,13 @@ if __name__ == "__main__":
                 or []
             ):
                 count_projects_of_service_provider.labels(
+                    sp_proj.service_provider_uuid,
+                    sp_proj.customer_uuid,
+                    sp_proj.customer_name,
+                    sp_proj.customer_organization_group_uuid,
+                    sp_proj.customer_organization_group_name,
+                ).set(sp_proj.count)
+                count_projects_of_service_provider_deprecated.labels(
                     sp_proj.service_provider_uuid,
                     sp_proj.customer_uuid,
                     sp_proj.customer_name,
@@ -544,6 +860,14 @@ if __name__ == "__main__":
                     sp_proj_oecd.customer_organization_group_name,
                     sp_proj_oecd.oecd_fos_2007_name,
                 ).set(sp_proj_oecd.count)
+                count_projects_of_service_provider_grouped_by_oecd_deprecated.labels(
+                    sp_proj_oecd.service_provider_uuid,
+                    sp_proj_oecd.customer_uuid,
+                    sp_proj_oecd.customer_name,
+                    sp_proj_oecd.customer_organization_group_uuid,
+                    sp_proj_oecd.customer_organization_group_name,
+                    sp_proj_oecd.oecd_fos_2007_name,
+                ).set(sp_proj_oecd.count)
 
             logger.info("Collecting total_cost_of_active_resources_per_offering")
             for cost_stat in (
@@ -556,12 +880,22 @@ if __name__ == "__main__":
                     cost_stat.offering_uuid,
                     cost_stat.offering_name,
                 ).set(cost_stat.cost)
+                total_cost_of_active_resources_per_offering_deprecated.labels(
+                    cost_stat.offering_uuid,
+                    cost_stat.offering_name,
+                ).set(cost_stat.cost)
 
             logger.info("Collecting offerings_counter_stats")
             for counter in (
                 marketplace_stats_offerings_counter_stats_list.sync(client=client) or []
             ):
                 offerings_counter_stats.labels(
+                    counter.service_provider_uuid,
+                    counter.service_provider_name,
+                    counter.category_uuid,
+                    counter.category_title,
+                ).set(counter.count)
+                offerings_counter_stats_deprecated.labels(
                     counter.service_provider_uuid,
                     counter.service_provider_name,
                     counter.category_uuid,
@@ -580,6 +914,10 @@ if __name__ == "__main__":
                         code,
                         usage_type,
                     ).set(usage)
+                    projects_usages_grouped_by_oecd_deprecated.labels(
+                        code,
+                        usage_type,
+                    ).set(usage)
 
             logger.info("Collecting projects_limits_grouped_by_oecd")
             usage_data = (
@@ -591,6 +929,10 @@ if __name__ == "__main__":
             for code, limits in limit_oecd_usages.items():
                 for limit_name, limit in limits.items():
                     projects_limits_grouped_by_oecd.labels(
+                        code,
+                        limit_name,
+                    ).set(limit)
+                    projects_limits_grouped_by_oecd_deprecated.labels(
                         code,
                         limit_name,
                     ).set(limit)
@@ -610,6 +952,10 @@ if __name__ == "__main__":
                         is_industry,
                         usage_type,
                     ).set(usage)
+                    projects_usages_grouped_by_industry_flag_deprecated.labels(
+                        is_industry,
+                        usage_type,
+                    ).set(usage)
 
             logger.info("Collecting projects_limits_grouped_by_industry_flag")
             usage_data = marketplace_stats_projects_limits_grouped_by_industry_flag_retrieve.sync(
@@ -619,6 +965,10 @@ if __name__ == "__main__":
             for is_industry, limits in limit_flag_usages.items():
                 for limit_name, limit in limits.items():
                     projects_limits_grouped_by_industry_flag.labels(
+                        is_industry,
+                        limit_name,
+                    ).set(limit)
+                    projects_limits_grouped_by_industry_flag_deprecated.labels(
                         is_industry,
                         limit_name,
                     ).set(limit)
@@ -634,6 +984,10 @@ if __name__ == "__main__":
                     unique_user.customer_uuid,
                     unique_user.customer_name,
                 ).set(unique_user.count_users)
+                count_unique_users_connected_with_active_resources_deprecated.labels(
+                    unique_user.customer_uuid,
+                    unique_user.customer_name,
+                ).set(unique_user.count_users)
 
             total_active_resources = 0
 
@@ -645,6 +999,11 @@ if __name__ == "__main__":
                 or []
             ):
                 count_active_resources_grouped_by_offering.labels(
+                    active_res.uuid,
+                    active_res.name,
+                    active_res.country,
+                ).set(active_res.count)
+                count_active_resources_grouped_by_offering_deprecated.labels(
                     active_res.uuid,
                     active_res.name,
                     active_res.country,
@@ -665,6 +1024,9 @@ if __name__ == "__main__":
                 count_active_resources_grouped_by_offering_country.labels(
                     country_res.country,
                 ).set(country_res.count)
+                count_active_resources_grouped_by_offering_country_deprecated.labels(
+                    country_res.country,
+                ).set(country_res.count)
 
             logger.info(
                 "Collecting count_active_resources_grouped_by_organization_group"
@@ -679,6 +1041,10 @@ if __name__ == "__main__":
                     group_res.uuid,
                     group_res.name,
                 ).set(group_res.count)
+                count_active_resources_grouped_by_organization_group_deprecated.labels(
+                    group_res.uuid,
+                    group_res.name,
+                ).set(group_res.count)
             logger.info("Collecting count_projects_grouped_by_provider_and_oecd")
             for proj_oecd in (
                 marketplace_stats_count_projects_grouped_by_provider_and_oecd_list.sync(
@@ -686,6 +1052,12 @@ if __name__ == "__main__":
                 )
             ) or []:
                 count_projects_grouped_by_provider_and_oecd.labels(
+                    proj_oecd.uuid,
+                    proj_oecd.name,
+                    proj_oecd.abbreviation,
+                    proj_oecd.oecd,
+                ).set(proj_oecd.count)
+                count_projects_grouped_by_provider_and_oecd_deprecated.labels(
                     proj_oecd.uuid,
                     proj_oecd.name,
                     proj_oecd.abbreviation,
@@ -706,6 +1078,12 @@ if __name__ == "__main__":
                     proj_ind.abbreviation,
                     proj_ind.is_industry,
                 ).set(proj_ind.count)
+                count_projects_grouped_by_provider_and_industry_flag_deprecated.labels(
+                    proj_ind.uuid,
+                    proj_ind.name,
+                    proj_ind.abbreviation,
+                    proj_ind.is_industry,
+                ).set(proj_ind.count)
 
             logger.info("Collecting resource_provisioning_stats")
             for stat in (
@@ -719,22 +1097,43 @@ if __name__ == "__main__":
                     stat.service_provider_name,
                 )
                 provisioning_count.labels(*labels).set(stat.provisioning_count)
+                provisioning_count_deprecated.labels(*labels).set(
+                    stat.provisioning_count
+                )
                 provisioning_success_count.labels(*labels).set(
+                    stat.provisioning_success_count
+                )
+                provisioning_success_count_deprecated.labels(*labels).set(
                     stat.provisioning_success_count
                 )
                 provisioning_error_count.labels(*labels).set(
                     stat.provisioning_error_count
                 )
+                provisioning_error_count_deprecated.labels(*labels).set(
+                    stat.provisioning_error_count
+                )
                 provisioning_in_progress_count.labels(*labels).set(
+                    stat.provisioning_in_progress_count
+                )
+                provisioning_in_progress_count_deprecated.labels(*labels).set(
                     stat.provisioning_in_progress_count
                 )
                 provisioning_success_rate.labels(*labels).set(
                     stat.provisioning_success_rate
                 )
+                provisioning_success_rate_deprecated.labels(*labels).set(
+                    stat.provisioning_success_rate
+                )
                 avg_provisioning_duration.labels(*labels).set(
                     stat.avg_provisioning_duration
                 )
+                avg_provisioning_duration_deprecated.labels(*labels).set(
+                    stat.avg_provisioning_duration
+                )
                 avg_pending_duration.labels(*labels).set(stat.avg_pending_duration)
+                avg_pending_duration_deprecated.labels(*labels).set(
+                    stat.avg_pending_duration
+                )
 
             logger.info("Collecting waldur_user_auth_method_count")
             for auth_stat in (
