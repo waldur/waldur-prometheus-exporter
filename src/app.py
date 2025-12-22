@@ -418,7 +418,9 @@ if __name__ == "__main__":
 
             logger.info("Collecting organization_project_count")
             for org_proj in (
-                marketplace_stats_organization_project_count_list.sync_all(client=client)
+                marketplace_stats_organization_project_count_list.sync_all(
+                    client=client
+                )
                 or []
             ):
                 organization_project_count.labels(
@@ -427,7 +429,9 @@ if __name__ == "__main__":
 
             logger.info("Collecting organization_resource_count")
             for org_res in (
-                marketplace_stats_organization_resource_count_list.sync_all(client=client)
+                marketplace_stats_organization_resource_count_list.sync_all(
+                    client=client
+                )
                 or []
             ):
                 organization_resource_count.labels(
@@ -438,7 +442,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting organization_members_count")
             for member_count_stat in (
-                marketplace_stats_customer_member_count_list.sync_all(client=client) or []
+                marketplace_stats_customer_member_count_list.sync_all(client=client)
+                or []
             ):
                 member_count = member_count_stat.count or 0
                 organization_members_count.labels(
@@ -474,7 +479,9 @@ if __name__ == "__main__":
 
             logger.info("Collecting component_usages_per_project")
             for proj_usage in (
-                marketplace_stats_component_usages_per_project_list.sync_all(client=client)
+                marketplace_stats_component_usages_per_project_list.sync_all(
+                    client=client
+                )
                 or []
             ):
                 component_usages_per_project.labels(
@@ -559,7 +566,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting offerings_counter_stats")
             for counter in (
-                marketplace_stats_offerings_counter_stats_list.sync_all(client=client) or []
+                marketplace_stats_offerings_counter_stats_list.sync_all(client=client)
+                or []
             ):
                 offerings_counter_stats.labels(
                     counter.service_provider_uuid,
@@ -709,7 +717,9 @@ if __name__ == "__main__":
 
             logger.info("Collecting resource_provisioning_stats")
             for stat in (
-                marketplace_stats_resource_provisioning_stats_list.sync_all(client=client)
+                marketplace_stats_resource_provisioning_stats_list.sync_all(
+                    client=client
+                )
                 or []
             ):
                 labels = (
@@ -738,7 +748,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting waldur_user_auth_method_count")
             for auth_stat in (
-                marketplace_stats_user_auth_method_count_list.sync_all(client=client) or []
+                marketplace_stats_user_auth_method_count_list.sync_all(client=client)
+                or []
             ):
                 waldur_user_auth_method_count.labels(auth_stat.method).set(
                     auth_stat.count
@@ -746,7 +757,9 @@ if __name__ == "__main__":
 
             logger.info("Collecting waldur_user_identity_source_count")
             for identity_stat in (
-                marketplace_stats_user_identity_source_count_list.sync_all(client=client)
+                marketplace_stats_user_identity_source_count_list.sync_all(
+                    client=client
+                )
                 or []
             ):
                 waldur_user_identity_source_count.labels(
@@ -755,7 +768,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting waldur_user_organization_count")
             for org_stat in (
-                marketplace_stats_user_organization_count_list.sync_all(client=client) or []
+                marketplace_stats_user_organization_count_list.sync_all(client=client)
+                or []
             ):
                 waldur_user_organization_count.labels(org_stat.organization).set(
                     org_stat.count
@@ -763,7 +777,8 @@ if __name__ == "__main__":
 
             logger.info("Collecting waldur_user_affiliation_count")
             for aff_stat in (
-                marketplace_stats_user_affiliation_count_list.sync_all(client=client) or []
+                marketplace_stats_user_affiliation_count_list.sync_all(client=client)
+                or []
             ):
                 waldur_user_affiliation_count.labels(aff_stat.affiliation).set(
                     aff_stat.count
