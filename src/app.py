@@ -101,25 +101,25 @@ if __name__ == "__main__":
     )
 
     organization_project_count = Gauge(
-        "organization_project_count",
+        "waldur_organization_project_count",
         "Count of projects for each organization.",
         ["abbreviation", "name", "uuid"],
     )
 
     organization_resource_count = Gauge(
-        "organization_resource_count",
+        "waldur_organization_resource_count",
         "Count of resources for every organization.",
         ["abbreviation", "name", "uuid"],
     )
 
     organization_members_count = Gauge(
-        "organization_members_count",
+        "waldur_organization_members_count",
         "Count of members for every organization.",
         ["abbreviation", "name", "uuid", "has_resources"],
     )
 
     resources_limits = Gauge(
-        "resources_limits",
+        "waldur_resources_limits",
         "Resources limits",
         [
             "offering_uuid",
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     )
 
     aggregated_usages = Gauge(
-        "aggregated_usages",
+        "waldur_aggregated_usages",
         "Aggregated usages",
         [
             "offering_uuid",
@@ -143,13 +143,13 @@ if __name__ == "__main__":
     )
 
     component_usages_per_project = Gauge(
-        "component_usages_per_project",
+        "waldur_component_usages_per_project",
         "Component usages per project",
         ["project_uuid", "component_type"],
     )
 
     aggregated_usages_per_month = Gauge(
-        "aggregated_usages_per_month",
+        "waldur_aggregated_usages_per_month",
         "Aggregated usages per month",
         [
             "offering_uuid",
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     )
 
     count_users_of_service_provider = Gauge(
-        "count_users_of_service_provider",
+        "waldur_count_users_of_service_provider",
         "Count of users visible to service provider.",
         [
             "service_provider_uuid",
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     )
 
     count_projects_of_service_provider = Gauge(
-        "count_projects_of_service_provider",
+        "waldur_count_projects_of_service_provider",
         "Count of projects visible to service provider.",
         [
             "service_provider_uuid",
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     )
 
     count_projects_of_service_provider_grouped_by_oecd = Gauge(
-        "count_projects_of_service_provider_grouped_by_oecd",
+        "waldur_count_projects_of_service_provider_grouped_by_oecd",
         "Count of projects visible to service provider and grouped by oecd.",
         [
             "service_provider_uuid",
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     )
 
     total_cost_of_active_resources_per_offering = Gauge(
-        "total_cost_of_active_resources_per_offering",
+        "waldur_total_cost_of_active_resources_per_offering",
         "Total cost of active resources per offering.",
         [
             "offering_uuid",
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     )
 
     projects_usages_grouped_by_oecd = Gauge(
-        "projects_usages_grouped_by_oecd",
+        "waldur_projects_usages_grouped_by_oecd",
         "Projects usages grouped by oecd.",
         [
             "oecd_code",
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     )
 
     projects_limits_grouped_by_oecd = Gauge(
-        "projects_limits_grouped_by_oecd",
+        "waldur_projects_limits_grouped_by_oecd",
         "Projects limits grouped by oecd.",
         [
             "oecd_code",
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     )
 
     projects_usages_grouped_by_industry_flag = Gauge(
-        "projects_usages_grouped_by_industry_flag",
+        "waldur_projects_usages_grouped_by_industry_flag",
         "Projects usages grouped by industry flag.",
         [
             "is_industry",
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     )
 
     projects_limits_grouped_by_industry_flag = Gauge(
-        "projects_limits_grouped_by_industry_flag",
+        "waldur_projects_limits_grouped_by_industry_flag",
         "Projects limits grouped by industry flag.",
         [
             "is_industry",
@@ -245,7 +245,7 @@ if __name__ == "__main__":
     )
 
     count_unique_users_connected_with_active_resources = Gauge(
-        "count_unique_users_connected_with_active_resources_of_service_provider",
+        "waldur_count_unique_users_connected_with_active_resources_of_service_provider",
         "Count unique users connected with active resources of service_provider .",
         [
             "customer_uuid",
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     )
 
     count_active_resources_grouped_by_offering = Gauge(
-        "count_active_resources_grouped_by_offering",
+        "waldur_count_active_resources_grouped_by_offering",
         "Count active resources grouped by offering.",
         [
             "uuid",
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     )
 
     count_active_resources_grouped_by_offering_country = Gauge(
-        "count_active_resources_grouped_by_offering_country",
+        "waldur_count_active_resources_grouped_by_offering_country",
         "Count active resources grouped by country.",
         [
             "country",
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     )
 
     count_active_resources_grouped_by_organization_group = Gauge(
-        "count_active_resources_grouped_by_organization_group",
+        "waldur_count_active_resources_grouped_by_organization_group",
         "Count active resources grouped by organization_group.",
         [
             "uuid",
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     )
 
     count_projects_grouped_by_provider_and_oecd = Gauge(
-        "count_projects_grouped_by_provider_and_oecd",
+        "waldur_count_projects_grouped_by_provider_and_oecd",
         "Count projects with active resources grouped by provider and oecd",
         [
             "uuid",
@@ -291,7 +291,7 @@ if __name__ == "__main__":
         ],
     )
     offerings_counter_stats = Gauge(
-        "offerings_counter_stats",
+        "waldur_offerings_counter_stats",
         "Count of offerings grouped by service provider and category",
         [
             "service_provider_uuid",
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         ],
     )
     count_projects_grouped_by_provider_and_industry_flag = Gauge(
-        "count_projects_grouped_by_provider_and_industry_flag",
+        "waldur_count_projects_grouped_by_provider_and_industry_flag",
         "Count projects with active resources grouped by provider and industry flag",
         [
             "uuid",
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     )
 
     provisioning_count = Gauge(
-        "provisioning_count",
+        "waldur_provisioning_count",
         "Total finished provisioning attempts (DONE + ERRED)",
         [
             "offering_uuid",
@@ -322,7 +322,7 @@ if __name__ == "__main__":
         ],
     )
     provisioning_success_count = Gauge(
-        "provisioning_success_count",
+        "waldur_provisioning_success_count",
         "Total successful provisioning attempts (DONE)",
         [
             "offering_uuid",
@@ -332,7 +332,7 @@ if __name__ == "__main__":
         ],
     )
     provisioning_error_count = Gauge(
-        "provisioning_error_count",
+        "waldur_provisioning_error_count",
         "Total failed provisioning attempts (ERRED)",
         [
             "offering_uuid",
@@ -342,7 +342,7 @@ if __name__ == "__main__":
         ],
     )
     provisioning_in_progress_count = Gauge(
-        "provisioning_in_progress_count",
+        "waldur_provisioning_in_progress_count",
         "Total currently in-progress provisioning attempts",
         [
             "offering_uuid",
@@ -352,7 +352,7 @@ if __name__ == "__main__":
         ],
     )
     provisioning_success_rate = Gauge(
-        "provisioning_success_rate",
+        "waldur_provisioning_success_rate",
         "Rate of successful provisioning (0.0 to 1.0)",
         [
             "offering_uuid",
@@ -362,7 +362,7 @@ if __name__ == "__main__":
         ],
     )
     avg_provisioning_duration = Gauge(
-        "avg_provisioning_duration",
+        "waldur_avg_provisioning_duration",
         "Average duration in seconds from Executing to Terminal state",
         [
             "offering_uuid",
@@ -372,7 +372,7 @@ if __name__ == "__main__":
         ],
     )
     avg_pending_duration = Gauge(
-        "avg_pending_duration",
+        "waldur_avg_pending_duration",
         "Average duration in seconds from Creation to Executing state",
         [
             "offering_uuid",
