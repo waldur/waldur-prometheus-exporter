@@ -7,10 +7,11 @@ include:
     file: "/templates/test/lint-dockerfile.yaml"
   - project: "waldur/waldur-pipelines"
     file: "/templates/release/publish.yml"
-  - project: "waldur/waldur-pipelines"
-    file: "/templates/sbom/upload-sboms-to-docs.yml"
-  - project: "waldur/waldur-pipelines"
-    file: "/templates/sbom/generate-image-sbom.yml"
+  # Temporarily disabled
+  # - project: "waldur/waldur-pipelines"
+  #   file: "/templates/sbom/upload-sboms-to-docs.yml"
+  # - project: "waldur/waldur-pipelines"
+  #   file: "/templates/sbom/generate-image-sbom.yml"
 
 Run linters:
   image: "registry.hpc.ut.ee/mirror/library/python:3.11"
@@ -30,51 +31,55 @@ Run linters:
     - pip install pre-commit
     - pre-commit run --all
 
-Generate Image SBOM:
-  extends: .Generate Image SBOM template
-  variables:
-    PROJECT_NAME: "waldur-prometheus-exporter"
+# Temporarily disabled
+# Generate Image SBOM:
+#   extends: .Generate Image SBOM template
+#   variables:
+#     PROJECT_NAME: "waldur-prometheus-exporter"
 
-Generate Codebase SBOM:
-  image:
-    name: "registry.hpc.ut.ee/mirror/library/python:3.11-bullseye"
-  stage: build
-  rules:
-      - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
-  variables:
-    PROJECT_NAME: "waldur-prometheus-exporter"
-  before_script:
-    - apt-get update
-  script:
-    - pip install uv
-    - uv sync
-    - uv run pip install cyclonedx-bom
-    - uv run cyclonedx-py environment -o ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
-    - cat ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json | head -n 100
-    - echo "SBOM generated. Size:"
-    - du -h ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
-    - tar -czf ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
-    - echo "SBOM archived. Size:"
-    - du -h ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
-  artifacts:
-    paths:
-      - ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
-    expire_in: 1 day
+# Temporarily disabled
+# Generate Codebase SBOM:
+#   image:
+#     name: "registry.hpc.ut.ee/mirror/library/python:3.11-bullseye"
+#   stage: build
+#   rules:
+#       - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+#   variables:
+#     PROJECT_NAME: "waldur-prometheus-exporter"
+#   before_script:
+#     - apt-get update
+#   script:
+#     - pip install uv
+#     - uv sync
+#     - uv run pip install cyclonedx-bom
+#     - uv run cyclonedx-py environment -o ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
+#     - cat ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json | head -n 100
+#     - echo "SBOM generated. Size:"
+#     - du -h ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
+#     - tar -czf ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.json
+#     - echo "SBOM archived. Size:"
+#     - du -h ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+#   artifacts:
+#     paths:
+#       - ${PROJECT_NAME}-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+#     expire_in: 1 day
 
-Upload Source SBOM:
-  extends: .Upload SBOM template
-  needs:
-    - Generate Codebase SBOM
-  variables:
-    PROJECT_NAME: "waldur-prometheus-exporter"
-    SBOM_TYPE: "source"
-    SBOM_DIR: "source"
+# Temporarily disabled
+# Upload Source SBOM:
+#   extends: .Upload SBOM template
+#   needs:
+#     - Generate Codebase SBOM
+#   variables:
+#     PROJECT_NAME: "waldur-prometheus-exporter"
+#     SBOM_TYPE: "source"
+#     SBOM_DIR: "source"
 
-Upload Image SBOM:
-  extends: .Upload SBOM template
-  needs:
-    - Generate Image SBOM
-  variables:
-    PROJECT_NAME: "waldur-prometheus-exporter"
-    SBOM_TYPE: "image"
-    SBOM_DIR: "images"
+# Temporarily disabled
+# Upload Image SBOM:
+#   extends: .Upload SBOM template
+#   needs:
+#     - Generate Image SBOM
+#   variables:
+#     PROJECT_NAME: "waldur-prometheus-exporter"
+#     SBOM_TYPE: "image"
+#     SBOM_DIR: "images"
