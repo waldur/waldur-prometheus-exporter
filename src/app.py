@@ -1,8 +1,7 @@
-import logging
 import os
-import sys
 from time import sleep
 
+import structlog
 from prometheus_client import Gauge, start_http_server
 from waldur_api_client.api.customers import customers_count
 from waldur_api_client.api.marketplace_stats import (
@@ -40,12 +39,10 @@ from waldur_api_client.api.users import users_count
 from waldur_api_client.client import AuthenticatedClient
 from waldur_api_client.errors import UnexpectedStatus
 
-handler = logging.StreamHandler(sys.stdout)
-logger = logging.getLogger(__name__)
-formatter = logging.Formatter("[%(levelname)s] [%(asctime)s] %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+from logging_config import configure_logging
+
+configure_logging()
+logger = structlog.get_logger(__name__)
 
 WALDUR_API_URL = os.environ["WALDUR_API_URL"]
 WALDUR_API_TOKEN = os.environ["WALDUR_API_TOKEN"]
@@ -785,8 +782,17 @@ if __name__ == "__main__":
                 )
 
         except UnexpectedStatus as e:
-            logger.error(f"Unable to collect metrics. Message: {e}")
+            logger.error(
+                "Unable to collect metrics",
+                error=str(e),
+                error_type="UnexpectedStatus",
+            )
         except Exception as e:
-            logger.error(f"Unable to collect metrics. Exception: {e}")
+            logger.error(
+                "Unable to collect metrics",
+                error=str(e),
+                error_type=type(e).__name__,
+                exc_info=True,
+            )
 
         sleep(120)
