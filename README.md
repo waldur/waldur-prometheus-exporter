@@ -28,6 +28,7 @@ docker run -d \
   -p 8080:8080 \
   -e WALDUR_API_URL="https://waldur.example.com/api" \
   -e WALDUR_API_TOKEN="your-waldur-api-token" \
+  -e LOG_FORMAT=json \
   waldur-prometheus-exporter
 ```
 
@@ -53,6 +54,7 @@ This project uses [`uv`](https://github.com/astral-sh/uv) for dependency managem
     ```bash
     export WALDUR_API_URL="https://waldur.example.com/api"
     export WALDUR_API_TOKEN="your-waldur-api-token"
+    export LOG_FORMAT=console  # optional: readable logs for development
     ```
 
 4. **Run the exporter:**
@@ -75,6 +77,7 @@ The application is configured via environment variables.
 |----------|-------------|----------|
 | `WALDUR_API_URL` | The URL of the Waldur Mastermind API (e.g., `https://waldur.example.com/api`). | Yes |
 | `WALDUR_API_TOKEN` | An authentication token for the Waldur API. | Yes |
+| `LOG_FORMAT` | Log output format: `json` (default) for structured JSON, `console` for readable development output. | No |
 
 - **Port**: The exporter listens on port `8080`.
 - **Collection Interval**: Metrics are collected every 120 seconds.
@@ -99,11 +102,11 @@ This project uses `ruff` for linting and formatting, and `mypy` for type checkin
 To run checks locally:
 
 ```bash
-# Install pre-commit hooks
+# Install pre-commit hooks (optional, runs on each commit)
 uv run pre-commit install
 
 # Run all checks
-uv run pre-commit run --all
+uv run pre-commit run --all-files
 ```
 
 ### CI/CD
