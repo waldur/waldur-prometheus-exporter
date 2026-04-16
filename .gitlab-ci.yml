@@ -14,7 +14,7 @@ include:
   #   file: "/templates/sbom/generate-image-sbom.yml"
 
 Run linters:
-  image: "registry.hpc.ut.ee/mirror/library/python:3.11"
+  image: registry.hpc.ut.ee/mirror/library/python:3.13-bookworm
   stage: test
   interruptible: true
   rules:
@@ -28,8 +28,8 @@ Run linters:
     # If event is related to a created merge request
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   script:
-    - pip install pre-commit
-    - pre-commit run --all
+    - pip install prek
+    - prek run --all-files
 
 # Temporarily disabled
 # Generate Image SBOM:
