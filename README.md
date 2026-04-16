@@ -103,15 +103,15 @@ To run checks locally:
 
 ```bash
 # Install pre-commit hooks (optional, runs on each commit)
-uv run pre-commit install
+uv tool install prek
 
 # Run all checks
-uv run pre-commit run --all-files
+uvx prek run --all-files
 ```
 
 ### CI/CD
 
 GitLab CI configures the pipeline to:
 
-- Run linters (`ruff`, `mypy`) via `pre-commit`.
+- Run linters (`ruff`, `mypy`) via `prek`.
 - Generate SBOMs (Software Bill of Materials).
