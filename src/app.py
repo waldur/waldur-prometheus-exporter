@@ -5,6 +5,7 @@ import structlog
 from prometheus_client import Gauge, start_http_server
 from waldur_api_client.api.customers import customers_count
 from waldur_api_client.api.marketplace_stats import (
+    marketplace_stats_aggregated_usage_trends_list,
     marketplace_stats_component_usages_list,
     marketplace_stats_component_usages_per_month_list,
     marketplace_stats_component_usages_per_project_list,
@@ -26,16 +27,19 @@ from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_projects_usages_grouped_by_industry_flag_retrieve,
     marketplace_stats_projects_usages_grouped_by_oecd_retrieve,
     marketplace_stats_resource_provisioning_stats_list,
+    marketplace_stats_resource_usage_by_customer_list,
+    marketplace_stats_resource_usage_by_organization_type_list,
     marketplace_stats_resources_limits_list,
     marketplace_stats_total_cost_of_active_resources_per_offering_list,
     marketplace_stats_user_affiliation_count_list,
     marketplace_stats_user_auth_method_count_list,
     marketplace_stats_user_identity_source_count_list,
     marketplace_stats_user_organization_count_list,
+    marketplace_stats_user_organization_type_count_list,
 )
 from waldur_api_client.api.projects import projects_count
 from waldur_api_client.api.roles import roles_list
-from waldur_api_client.api.users import users_count
+from waldur_api_client.api.users import users_count, users_user_registration_trend_list
 from waldur_api_client.client import AuthenticatedClient
 from waldur_api_client.errors import UnexpectedStatus
 
@@ -377,6 +381,58 @@ if __name__ == "__main__":
             "service_provider_uuid",
             "service_provider_name",
         ],
+    )
+
+    # ── New metrics: TS 1.1.54 gaps ──────────────────────────────────────────
+    resource_usage_by_customer_resources = Gauge(
+        "resource_usage_by_customer_resources",
+        "Total active resources per customer (activity)",
+        ["customer_name", "customer_abbreviation"],
+    )
+    resource_usage_by_customer_cost = Gauge(
+        "resource_usage_by_customer_cost",
+        "Total cost of active resources per customer (activity)",
+        ["customer_name", "customer_abbreviation"],
+    )
+    resource_usage_by_customer_component = Gauge(
+        "resource_usage_by_customer_component",
+        "Absolute component usage per customer and component type",
+        ["customer_name", "customer_abbreviation", "component_type"],
+    )
+    resource_limit_by_customer_component = Gauge(
+        "resource_limit_by_customer_component",
+        "Total allocated component limit per customer and component type",
+        ["customer_name", "customer_abbreviation", "component_type"],
+    )
+    resource_utilization_by_customer_component = Gauge(
+        "resource_utilization_by_customer_component",
+        "Component utilisation % (usage / limit × 100) per customer and component type",
+        ["customer_name", "customer_abbreviation", "component_type"],
+    )
+    waldur_user_organization_type_count = Gauge(
+        "waldur_user_organization_type_count",
+        "Total count of users grouped by organisation type (SCHAC URN)",
+        ["organization_type"],
+    )
+    resource_usage_by_organization_type = Gauge(
+        "resource_usage_by_organization_type",
+        "Component usage grouped by organisation type and component type",
+        ["organization_type", "component_type"],
+    )
+    resource_count_by_organization_type = Gauge(
+        "resource_count_by_organization_type",
+        "Active resource count grouped by organisation type and component type",
+        ["organization_type", "component_type"],
+    )
+    waldur_user_registration_count = Gauge(
+        "waldur_user_registration_count",
+        "Monthly count of new user registrations",
+        ["year", "month"],
+    )
+    waldur_platform_usage_trend_resource_count = Gauge(
+        "waldur_platform_usage_trend_resource_count",
+        "Monthly count of resources with recorded usage",
+        ["year", "month"],
     )
 
     while True:
@@ -780,6 +836,90 @@ if __name__ == "__main__":
                 waldur_user_affiliation_count.labels(aff_stat.affiliation).set(
                     aff_stat.count
                 )
+
+            # ── New metrics: TS 1.1.54 gaps ──────────────────────────────────
+            logger.info("Collecting resource_usage_by_customer_*")
+            for item in (
+                marketplace_stats_resource_usage_by_customer_list.sync_all(
+                    client=client
+                )
+                or []
+            ):
+                abbr = item.customer_abbreviation or ""
+                resource_usage_by_customer_resources.labels(
+                    customer_name=item.customer_name, customer_abbreviation=abbr
+                ).set(item.resources_total)
+                resource_usage_by_customer_cost.labels(
+                    customer_name=item.customer_name, customer_abbreviation=abbr
+                ).set(float(item.total_cost))
+                cust_usages = item.usages.additional_properties
+                cust_limits = item.limits.additional_properties
+                for component_type, cust_usage in cust_usages.items():
+                    usage_val = float(cust_usage)
+                    resource_usage_by_customer_component.labels(
+                        customer_name=item.customer_name,
+                        customer_abbreviation=abbr,
+                        component_type=component_type,
+                    ).set(usage_val)
+                    limit_val = float(cust_limits.get(component_type, "0"))
+                    resource_limit_by_customer_component.labels(
+                        customer_name=item.customer_name,
+                        customer_abbreviation=abbr,
+                        component_type=component_type,
+                    ).set(limit_val)
+                    util_pct = (
+                        round(usage_val / limit_val * 100, 2) if limit_val > 0 else 0.0
+                    )
+                    resource_utilization_by_customer_component.labels(
+                        customer_name=item.customer_name,
+                        customer_abbreviation=abbr,
+                        component_type=component_type,
+                    ).set(util_pct)
+
+            logger.info("Collecting waldur_user_organization_type_count")
+            for org_type_stat in (
+                marketplace_stats_user_organization_type_count_list.sync_all(
+                    client=client
+                )
+                or []
+            ):
+                waldur_user_organization_type_count.labels(
+                    organization_type=org_type_stat.organization_type or "unknown"
+                ).set(org_type_stat.count)
+
+            logger.info("Collecting resource_usage_by_organization_type")
+            for org_usage in (
+                marketplace_stats_resource_usage_by_organization_type_list.sync_all(
+                    client=client
+                )
+                or []
+            ):
+                org_type = org_usage.organization_type or "unknown"
+                resource_usage_by_organization_type.labels(
+                    organization_type=org_type,
+                    component_type=org_usage.component_type,
+                ).set(float(org_usage.usage))
+                resource_count_by_organization_type.labels(
+                    organization_type=org_type,
+                    component_type=org_usage.component_type,
+                ).set(org_usage.resource_count)
+
+            logger.info("Collecting waldur_user_registration_count")
+            for reg in users_user_registration_trend_list.sync_all(client=client) or []:
+                parts = reg.month.split("-")
+                year, month = parts[0], parts[1]
+                waldur_user_registration_count.labels(year=year, month=month).set(
+                    reg.count
+                )
+
+            logger.info("Collecting waldur_platform_usage_trend_resource_count")
+            for trend in (
+                marketplace_stats_aggregated_usage_trends_list.sync_all(client=client)
+                or []
+            ):
+                waldur_platform_usage_trend_resource_count.labels(
+                    year=str(trend.year), month=str(trend.month)
+                ).set(trend.resource_count)
 
         except UnexpectedStatus as e:
             logger.error(
