@@ -10,8 +10,7 @@ dependencies = [
     "waldur-api-client",
 ]
 
-[tool.uv.sources]
-waldur-api-client = { git = "https://github.com/waldur/py-client.git" }
+
 
 [tool.ruff]
 target-version = "py311"
