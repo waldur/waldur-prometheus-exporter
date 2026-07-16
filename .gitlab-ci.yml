@@ -111,9 +111,9 @@ Release tag:
         exit 1
       fi
 
-    # Now that we know it's on PyPI, add it
-    - uv add "waldur-api-client==$RELEASE_VERSION"
-    - git add pyproject.toml uv.lock
-    - git commit -m "chore: bump waldur-api-client to $RELEASE_VERSION" || echo "No changes"
-    - git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION" || echo "Tag already exists"
-    - git push origin $RELEASE_VERSION || echo "Tag already pushed"
+      # Now that we know it's on PyPI, add it
+      uv add "waldur-api-client==$RELEASE_VERSION"
+      git add pyproject.toml uv.lock
+      git commit -m "chore: bump waldur-api-client to $RELEASE_VERSION" || echo "No changes"
+      git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION" || echo "Tag already exists"
+      git push origin $RELEASE_VERSION || echo "Tag already pushed"
