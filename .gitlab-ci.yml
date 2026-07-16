@@ -115,4 +115,4 @@ Release tag:
     - uv add "waldur-api-client==$RELEASE_VERSION"
     - git add pyproject.toml uv.lock
     - git commit -m "chore: bump waldur-api-client to $RELEASE_VERSION" || echo "No changes"
-    - !reference [.release-tag-script, script]
+    - !reference [.release-tag-base, script]
