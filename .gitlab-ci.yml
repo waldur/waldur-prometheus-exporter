@@ -96,24 +96,5 @@ Release tag:
     - pip install uv
     # Safely poll PyPI's JSON API directly
     - |
-      SUCCESS=0
-      for i in $(seq 1 12); do
-        if curl -s -f "https://pypi.org/pypi/waldur-api-client/$RELEASE_VERSION/json" > /dev/null; then
-          SUCCESS=1
-          break
-        fi
-        echo "Attempt $i: Waiting for PyPI index to update..."
-        sleep 10
-      done
-
-      if [ $SUCCESS -eq 0 ]; then
-        echo "Error: waldur-api-client==$RELEASE_VERSION did not propagate to PyPI in time."
-        exit 1
-      fi
-
-      # Now that we know it's on PyPI, add it
-      uv add "waldur-api-client==$RELEASE_VERSION"
-      git add pyproject.toml uv.lock
-      git commit -m "chore: bump waldur-api-client to $RELEASE_VERSION" || echo "No changes"
       git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION" || echo "Tag already exists"
       git push origin $RELEASE_VERSION || echo "Tag already pushed"
