@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import structlog
-from prometheus_client import Gauge, start_http_server
+from prometheus_client import Gauge
 from waldur_api_client.api.customers import customers_count
 from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_aggregated_usage_trends_list,
@@ -44,6 +44,7 @@ from waldur_api_client.client import AuthenticatedClient
 from waldur_api_client.errors import UnexpectedStatus
 
 from logging_config import configure_logging
+from server import start_server
 
 configure_logging()
 logger = structlog.get_logger(__name__)
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         base_url=WALDUR_API_URL.rstrip("/api"),
         token=WALDUR_API_TOKEN,
     )
-    start_http_server(8080)
+    health = start_server(8080)
 
     users_total = Gauge("waldur_users_total", "Total count of users")
     customers_total = Gauge("waldur_customers_total", "Total count of organizations")
@@ -436,6 +437,7 @@ if __name__ == "__main__":
     )
 
     while True:
+        health.touch()
         try:
             logger.info("Collecting metrics")
 
@@ -920,6 +922,8 @@ if __name__ == "__main__":
                 waldur_platform_usage_trend_resource_count.labels(
                     year=str(trend.year), month=str(trend.month)
                 ).set(trend.resource_count)
+
+            health.mark_success()
 
         except UnexpectedStatus as e:
             logger.error(
