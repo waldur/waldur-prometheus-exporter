@@ -6,6 +6,8 @@ Readiness (/ready): last successful metrics scrape was recent.
 
 from __future__ import annotations
 
+import os
+import socket
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
@@ -80,9 +82,26 @@ class _Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
+class _Server(ThreadingHTTPServer):
+    """Serve on IPv6 as well as IPv4 wherever the kernel has IPv6.
+
+    ThreadingHTTPServer inherits address_family = AF_INET, so ("", port) binds
+    0.0.0.0 only. On an IPv6-only cluster that leaves the pod unreachable at its
+    own address and the httpGet probes are refused forever; on a dual-stack one
+    the IPv6 half is dark. With AF_INET6 and the Linux default
+    net.ipv6.bindv6only=0 the same socket serves both families.
+    /proc/net/if_inet6 is absent exactly when IPv6 is compiled out or disabled at
+    boot, where an AF_INET6 socket cannot be created at all.
+    """
+
+    address_family = (
+        socket.AF_INET6 if os.path.exists("/proc/net/if_inet6") else socket.AF_INET
+    )
+
+
 def start_server(port: int, max_age: float = DEFAULT_MAX_AGE) -> HealthState:
     health = HealthState(max_age=max_age)
     _Handler.health = health
-    server = ThreadingHTTPServer(("", port), _Handler)
+    server = _Server(("", port), _Handler)
     Thread(target=server.serve_forever, daemon=True).start()
     return health
