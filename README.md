@@ -114,4 +114,4 @@ uvx prek run --all-files
 GitLab CI configures the pipeline to:
 
 - Run linters (`ruff`, `mypy`) via `prek`.
-- Generate SBOMs (Software Bill of Materials).
+- Generate SBOMs (Software Bill of Materials) on release tags and attach them to the GitHub release.
