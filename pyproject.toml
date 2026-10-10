@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "prometheus-client==0.11.0",
     "structlog>=24.1.0",
-    "waldur-api-client",
+    "waldur-api-client==8.1.2",
 ]
 
 

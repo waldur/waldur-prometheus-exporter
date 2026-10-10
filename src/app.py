@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import structlog
-from prometheus_client import Gauge
+from prometheus_client import REGISTRY, Gauge
 from waldur_api_client.api.customers import customers_count
 from waldur_api_client.api.marketplace_stats import (
     marketplace_stats_aggregated_usage_trends_list,
@@ -44,6 +44,7 @@ from waldur_api_client.client import AuthenticatedClient
 from waldur_api_client.errors import UnexpectedStatus
 
 from logging_config import configure_logging
+from matrix_metrics import MatrixCollector
 from server import start_server
 
 configure_logging()
@@ -59,6 +60,9 @@ if __name__ == "__main__":
         token=WALDUR_API_TOKEN,
     )
     health = start_server(8080)
+
+    matrix = MatrixCollector()
+    REGISTRY.register(matrix)
 
     users_total = Gauge("waldur_users_total", "Total count of users")
     customers_total = Gauge("waldur_customers_total", "Total count of organizations")
@@ -938,5 +942,10 @@ if __name__ == "__main__":
                 error_type=type(e).__name__,
                 exc_info=True,
             )
+
+        # Outside the try above: a failing diagnostics call (a token that is
+        # neither staff nor support, a Waldur without Matrix) must neither skip
+        # the other metrics nor make the exporter unready.
+        matrix.update(client)
 
         sleep(120)
