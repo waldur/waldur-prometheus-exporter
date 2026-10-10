@@ -249,12 +249,16 @@ wheels = [
 
 [[package]]
 name = "waldur-api-client"
-version = "8.0.8"
-source = { git = "https://github.com/waldur/py-client.git#4c93889f97423d701ff6a0b557ee474aafa9ebc7" }
+version = "8.1.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "httpx" },
     { name = "python-dateutil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/82/ae/813a023bf08a077c11f062d3f232897412e68938626ad7d27e5cd582bc63/waldur_api_client-8.1.2.tar.gz", hash = "sha256:73f24d094a50a21c929ca1df9b5dff2c0ac965407cdc22cf4771f3aa1f7bf2c9", size = 2436933, upload-time = "2026-08-15T08:29:06.963Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/bb/257d011bf11ee746b8b6556a00d886fc3122735d34326735be98a17cf2b5/waldur_api_client-8.1.2-py3-none-any.whl", hash = "sha256:d59d978c5845293f25ab4140b646776177fe6f2fe04d7b6be0c4927740985272", size = 7531064, upload-time = "2026-08-15T08:29:09.615Z" },
 ]
 
 [[package]]
@@ -276,7 +280,7 @@ dev = [
 requires-dist = [
     { name = "prometheus-client", specifier = "==0.11.0" },
     { name = "structlog", specifier = ">=24.1.0" },
-    { name = "waldur-api-client", git = "https://github.com/waldur/py-client.git" },
+    { name = "waldur-api-client", specifier = "==8.1.2" },
 ]
 
 [package.metadata.requires-dev]
