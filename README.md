@@ -10,6 +10,7 @@ This service exports [Waldur](https://waldur.com) metrics in a format compatible
 - **Financial Statistics**: Total cost of active resources per offering.
 - **Usage & Limits**: Aggregated usages and limits grouped by various dimensions (OECD, industry flag).
 - **Provisioning Metrics**: Success rates, durations, and counts of provisioning attempts.
+- **Matrix Chat Health**: Diagnostics check results and rooms by state.
 
 ## Prerequisites
 
@@ -76,7 +77,7 @@ The application is configured via environment variables.
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `WALDUR_API_URL` | The URL of the Waldur Mastermind API (e.g., `https://waldur.example.com/api`). | Yes |
-| `WALDUR_API_TOKEN` | An authentication token for the Waldur API. | Yes |
+| `WALDUR_API_TOKEN` | An authentication token for the Waldur API. The Matrix chat metrics need a staff or support user's token (staff only with an older Waldur Mastermind). | Yes |
 | `LOG_FORMAT` | Log output format: `json` (default) for structured JSON, `console` for readable development output. | No |
 
 - **Port**: The exporter listens on port `8080`.
@@ -92,6 +93,20 @@ The exporter exposes metrics with the `waldur_` prefix. Some key metrics include
 - `waldur_marketplace_resources_total`: Total count of active resources.
 - `waldur_total_cost_of_active_resources_per_offering`: Cost metrics.
 - `waldur_provisioning_success_rate`: Provisioning reliability metrics.
+
+### Matrix chat
+
+Read from `GET /api/admin/matrix/diagnostics/`, which only answers staff and support users, and from the room counts of `/api/matrix/rooms/`. An older Waldur Mastermind answers diagnostics for staff users only.
+
+| Metric | Labels | Description |
+|--------|--------|-------------|
+| `waldur_matrix_diagnostics_up` | | `1` if the last diagnostics call succeeded, `0` if it failed. |
+| `waldur_matrix_check_passed` | `check` | `1` if the diagnostics check passed, `0` if it failed. One series per check the endpoint returns, e.g. `bot_running`, `bot_whoami`, `homeserver_reachable`, `appservice_ping`, `room_stats`. |
+| `waldur_matrix_rooms` | `state` | Rooms per state: `active`, `archived`, `creating`, `disabling`, `error`. |
+
+The other Matrix metrics are only published while the diagnostics call succeeds, and the room counts only while every one of them succeeds. A failure is logged as a warning when it starts or changes, not on every collection; a `403` means the token's user is not staff or support.
+
+The endpoint answers even where Matrix chat is not set up, with its checks failing, and not every check matters on every deployment: `livekit_configured` fails wherever calls are not set up. Alert on the checks you need rather than on any `0`.
 
 ## Development
 
