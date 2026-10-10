@@ -9,6 +9,9 @@ from waldur_api_client.api.admin import admin_matrix_diagnostics_retrieve
 from waldur_api_client.api.matrix import matrix_rooms_count
 from waldur_api_client.client import AuthenticatedClient
 from waldur_api_client.errors import UnexpectedStatus
+from waldur_api_client.models.matrix_diagnostics_response import (
+    MatrixDiagnosticsResponse,
+)
 from waldur_api_client.models.matrix_room_state_enum import MatrixRoomStateEnum
 
 logger = structlog.get_logger(__name__)
@@ -21,6 +24,18 @@ class Snapshot:
     rooms: dict[str, int] = field(default_factory=dict)
 
 
+def read_checks(diagnostics: MatrixDiagnosticsResponse) -> dict[str, bool]:
+    # The generated client does not check types, and collect() runs in the
+    # HTTP server thread, where a value it cannot publish would fail the whole
+    # scrape and with it every other metric.
+    checks = {}
+    for check in diagnostics.checks:
+        if not isinstance(check.name, str) or not isinstance(check.ok, bool):
+            raise TypeError(f"check {check.name!r} has ok={check.ok!r}")
+        checks[check.name] = check.ok
+    return checks
+
+
 def count_rooms(client: AuthenticatedClient) -> dict[str, int]:
     return {
         state.value: matrix_rooms_count.sync(client=client, state=state)
@@ -31,7 +46,10 @@ def count_rooms(client: AuthenticatedClient) -> dict[str, int]:
 def describe_failure(error: Exception) -> str:
     if isinstance(error, UnexpectedStatus):
         if error.status_code == 403:
-            return "HTTP 403: the API token's user is not staff or support"
+            return (
+                "HTTP 403: the API token's user is not staff or support, or "
+                "Waldur Mastermind is too old to let support read diagnostics"
+            )
         return f"HTTP {error.status_code}"
     return f"{type(error).__name__}: {error}"
 
@@ -54,7 +72,7 @@ class MatrixCollector:
         # Runs outside the loop's error handling, so nothing may escape it.
         try:
             diagnostics = admin_matrix_diagnostics_retrieve.sync(client=client)
-            checks = {check.name: check.ok for check in diagnostics.checks}
+            checks = read_checks(diagnostics)
         except Exception as e:
             self._snapshot = Snapshot(up=False)
             self._log_problems({"diagnostics": describe_failure(e)})

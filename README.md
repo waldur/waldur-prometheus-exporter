@@ -98,6 +98,8 @@ The exporter exposes metrics with the `waldur_` prefix. Some key metrics include
 
 Read from `GET /api/admin/matrix/diagnostics/`, which only answers staff and support users, and from the room counts of `/api/matrix/rooms/`. An older Waldur Mastermind answers diagnostics for staff users only.
 
+Use the token of a user kept for monitoring. Diagnostics runs some of its checks as the user who calls it, and signs that user in on a test device if they have opened the chat; with a person's own token, that happens to their account on every collection.
+
 | Metric | Labels | Description |
 |--------|--------|-------------|
 | `waldur_matrix_diagnostics_up` | | `1` if the last diagnostics call succeeded, `0` if it failed. |
