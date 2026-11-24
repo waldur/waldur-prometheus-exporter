@@ -14,7 +14,7 @@ This service exports [Waldur](https://waldur.com) metrics in a format compatible
 
 ## Prerequisites
 
-- Python 3.11+
+- Python 3.13+
 - Access to a Waldur Mastermind API
 
 ## Installation & Running

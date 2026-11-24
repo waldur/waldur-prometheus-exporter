@@ -3,7 +3,7 @@ name = "waldur-prometheus-exporter-1"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "prometheus-client==0.11.0",
     "structlog>=24.1.0",
@@ -13,7 +13,7 @@ dependencies = [
 
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -40,7 +40,7 @@ dev = [
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 strict = true
 ignore_missing_imports = true
 
