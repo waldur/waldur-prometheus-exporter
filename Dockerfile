@@ -1,9 +1,6 @@
 # --- Stage 1: Builder ---
 ARG DOCKER_REGISTRY=docker.io/
-FROM ${DOCKER_REGISTRY}astral/uv:python3.11-alpine AS builder
-
-# Install build-time dependencies
-RUN apk add --no-cache git
+FROM ${DOCKER_REGISTRY}astral/uv:python3.13-alpine AS builder
 
 # Set up project location
 WORKDIR /usr/src/waldur-prometheus-exporter
@@ -22,10 +19,12 @@ RUN uv sync --frozen --no-dev
 
 
 # --- Stage 2: Runtime ---
-FROM ${DOCKER_REGISTRY}python:3.11-alpine
+FROM ${DOCKER_REGISTRY}python:3.13-alpine
 
-# 1. Create a non-root user
-RUN addgroup -S waldur && adduser -S waldur -G waldur
+# 1. Take the Alpine security fixes released since the base image was built,
+#    and create a non-root user
+RUN apk upgrade --no-cache && \
+    addgroup -S waldur && adduser -S waldur -G waldur
 
 # 2. Set up working directory
 WORKDIR /usr/src/waldur-prometheus-exporter
